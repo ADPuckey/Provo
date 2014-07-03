@@ -1,0 +1,6 @@
+name: Provo
+version: 1.0
+description: A collection of useful commands and functions
+author: HAPPYGOPUCKEY
+website: jakeconley.com
+main: com.jakeconley.utilidades.Plugin
