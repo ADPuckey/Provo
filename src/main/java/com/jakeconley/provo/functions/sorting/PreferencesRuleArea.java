@@ -1,6 +1,6 @@
 package com.jakeconley.provo.functions.sorting;
 
-public class PreferencesRuleTargetArea
+public class PreferencesRuleArea
 {
 
 }

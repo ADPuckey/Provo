@@ -1,8 +1,11 @@
 package com.jakeconley.provo.functions.sorting;
 
+import org.bukkit.Material;
+
 public class PreferencesRule
 {
-    private PreferencesRuleTargetArea Area;
-    private PreferencesRuleItemGroup Items;
     private int Priority;
+    private PreferencesRuleTargetType TargetType;
+    private PreferencesRuleArea Area;
+    private String ItemGroupName;
 }
