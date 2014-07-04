@@ -1,6 +1,6 @@
 package com.jakeconley.provo.utils;
 
-import com.jakeconley.provo.Plugin;
+import com.jakeconley.provo.Provo;
 //import com.evilmidget38.UUIDFetcher;
 //import com.evilmidget38.NameFetcher;
 import java.util.Arrays;
@@ -23,10 +23,10 @@ public class Utils
         Severe(e.getMessage());
         e.printStackTrace();
     }
-    public static void Info(String message){ log.info("[AdPrivWarps] " + message); }
-    public static void Warning(String message){ log.warning("[AdPrivWarps] " + message); }
-    public static void Severe(String message){ log.severe("[AdPrivWarps] " + message); }
-    public static void Debug(String message){ if(Plugin.Debug) log.info("[AdPrivWarps - DEBUG] " + message); }
+    public static void Info(String message){ log.info("[Provo] " + message); }
+    public static void Warning(String message){ log.warning("[Provo] " + message); }
+    public static void Severe(String message){ log.severe("[Provo] " + message); }
+    public static void Debug(String message){ if(Provo.Debug) log.info("[Provo] " + message); }
     
     public static boolean LocationEquals(Location l1, Location l2)
     {

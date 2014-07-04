@@ -1,17 +1,23 @@
 package com.jakeconley.provo.functions.sorting;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class Sorting
 {
     public static SortingState SortInventory(Inventory i)
     {
-        HashMap<PreferencesRule,LinkedList<ItemStack>> matches = new HashMap<>();
+        if(i instanceof PlayerInventory)
+        {
+            PlayerInventory pi = (PlayerInventory) i;
+            
+            // Represents the strongest of each armor type
+            ItemStack sHelmet = null;
+            ItemStack sChestplate = null;
+            ItemStack sLeggings = null;
+            ItemStack sBoots = null;
+        }
         
         return SortingState.SUCCESSFUL;
     }

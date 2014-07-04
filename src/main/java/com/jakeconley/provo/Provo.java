@@ -3,7 +3,7 @@ package com.jakeconley.provo;
 import com.jakeconley.provo.utils.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Plugin extends JavaPlugin
+public class Provo extends JavaPlugin
 {
     public static boolean Debug = false;
     
