@@ -1,11 +1,12 @@
 package com.jakeconley.provo.functions.sorting;
 
+import com.jakeconley.provo.utils.inventory.InventoryType;
 import org.bukkit.Material;
 
 public class PreferencesRule
 {
     private int Priority;
-    private PreferencesRuleTargetType TargetType;
+    private InventoryType TargetType;
     private PreferencesRuleArea Area;
     private String ItemGroupName;
     
