@@ -39,7 +39,7 @@ public class Yaml
         }
         catch (Exception e) 
         {
-            Utils.LogException("while copying default config", e);
+            Utils.LogException("while copying default YAML", e);
             return false;
         }
     }
