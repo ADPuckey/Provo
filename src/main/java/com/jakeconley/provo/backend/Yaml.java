@@ -22,7 +22,7 @@ public class Yaml
     }
     
     // Shamelessly stole this from a bukkit tutorial
-    private boolean copy(InputStream in, File file)
+    public static boolean CopyTo(InputStream in, File file)
     {
         try
         {
@@ -53,10 +53,27 @@ public class Yaml
         }
         catch(Exception e)
         {
-            Utils.LogException("loading YAML " + this.File.getPath(), e);
+            Utils.LogException("loading YAML " + this.File.getName(), e);
             return false;
         }
     }
+    /**
+     * Load the file, and if it doesn't exist, copy it from a default path within the jar
+     * @param defpath Path to copy from
+     * @return True if successful
+     */
+    public boolean LoadWithDefault(String defpath)
+    {
+        if(!File.exists())
+        {
+            Utils.Warning("YAML " + File.getName() + " does not exist, attempting to create default...");
+            if(!CopyTo(this.getClass().getResourceAsStream(defpath), File)) return false;
+            Utils.Info("Creation successful.");
+        }
+        
+        return this.Load();
+    }
+    
     public boolean SaveFile()
     {
         try
@@ -66,7 +83,7 @@ public class Yaml
         }
         catch(Exception e)
         {
-            Utils.LogException("saving config", e);
+            Utils.LogException("saving YAML " + File.getName(), e);
             return false;
         }
     }

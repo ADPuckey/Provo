@@ -1,1 +1,14 @@
-# Reserved: blocks_general, items_general, edible, flammable, burnable
+# Reserved: blocks, items, edible, flammable, burnable
+food:
+  - COOKED_BEEF
+  - COOKED_CHICKEN
+  - COOKED_FISH
+  - APPLE
+  - BAKED_POTATO
+  - BREAD
+  - CARROT
+  - CARROT_ITEM
+  #the above: wat
+  - MELON
+  - MUSHROOM_SOUP
+  - PORK
