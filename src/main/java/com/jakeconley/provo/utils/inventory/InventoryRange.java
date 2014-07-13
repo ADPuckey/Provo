@@ -12,10 +12,11 @@ public class InventoryRange
     public InventoryCoords getStart(){ return this.Start; }
     public InventoryCoords getEnd(){ return this.End; }
     
-    public InventoryRange(InventoryCoords _Start, InventoryCoords _End)
+    public InventoryRange(InventoryCoords _Start, InventoryCoords _End, Type _Type)
     {
         this.Start = _Start;
         this.End = _End;
+        this.Type = _Type;
     }
     
     public boolean Contains(InventoryCoords v, Type type)

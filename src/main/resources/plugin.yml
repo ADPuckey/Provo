@@ -3,4 +3,4 @@ version: 1.0
 description: A collection of useful commands and functions
 author: HAPPYGOPUCKEY
 website: http://jakeconley.com
-main: com.jakeconley.provo.Plugin
+main: com.jakeconley.provo.Provo

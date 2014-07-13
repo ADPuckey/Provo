@@ -32,7 +32,7 @@ Configuration
 Stay tuned.
 
 
-About the plugin
+About the code
 =====
 
 Inventory Sorting
@@ -54,4 +54,11 @@ Also, `/sort` should automatically put armor in its respective slots.
 
 (How will it account for all inventory space?  Cache beforehand or do a series of swaps or what)
 
+Meta scripts
+------------
 
+Meta code generation scripts are found in the meta_scripts directory, open them for more info.
+
+They're not too special, not used in the plugin itself, just that since java lacks a preprocessor I drew them up to generate code I was otherwise too lazy to.
+
+Figured I might as well include them in the repo.

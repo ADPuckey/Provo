@@ -2,11 +2,15 @@ package com.jakeconley.provo.utils.inventory;
 
 import static com.jakeconley.provo.utils.inventory.InventoryUtils.ROW_LENGTH;
 
+/**
+ * Class for supporting InventoryTweaks-style coordinates.  E.g. D1 for the first hotbar space in a player's inventory
+ * @author jake
+ */
 public class InventoryCoords
 {
     private char RowLetter;
-    private int RowNumber;
-    private int ColumnNumber;
+    private int RowNumber;//Zero-indexed
+    private int ColumnNumber;//NOT zero-indexed
     
     public char getRowLetter(){ return RowLetter; }
     public int getRowNumber(){ return RowNumber; }
@@ -18,12 +22,19 @@ public class InventoryCoords
         this.ColumnNumber = _ColumnNumber;
     }
     
+    
+    /*
+        Keep in mind, chest inventories are normal (index 0 is top right corner), but
+        in player inventories index 0-8 are the hotbar and index 9 is the top right corner.
+        See card https://trello.com/c/CllYsKLq for more
+    */
     public static InventoryCoords FromIndex(int index, InventoryType type)
     {
         int row_i;
         int col_i;
-        col_i = index % ROW_LENGTH;
+        col_i = (index % ROW_LENGTH);
         row_i = (index - col_i) / ROW_LENGTH;
+        col_i += 1;//un-zero-index this
         
         char row = '_';// for some shitty reason i get "variable might not have been initialized" errors i hate java
         if(type == InventoryType.PLAYER)
@@ -63,12 +74,7 @@ public class InventoryCoords
         char[] split = s.toUpperCase().toCharArray();
         
         int row = 0;//zero-indexed row
-        int col = 0;//zero-indexed column
-        
-        /*
-            Keep in mind, chest inventories are normal (index 0 is top right corner), but
-            in player inventories index 0-8 are the hotbar and index 9 is the top right corner.
-        */
+        int col = 0;//non-zero-indexed column to be parsed later
         if(split[0] == 'A')
         {
             if(type == InventoryType.PLAYER) row = 1;// Correction
@@ -103,10 +109,8 @@ public class InventoryCoords
         else return null;//if not a-f, invalid string
         
         try{ col = Integer.parseInt(Character.toString(split[1])); }
-        catch(NumberFormatException e){ return null;/* second char needs to be an int */ }
-        
-        col -= 1;//From nonzero index to zero index
-        if(col < 0 || col > ROW_LENGTH) return null;//Out of range
+        catch(NumberFormatException e){ return null;/* second char needs to be an int */ }        
+        if(col < 1 || col > ROW_LENGTH) return null;//Out of range
         
         return new InventoryCoords(split[0], row, col);
     }
@@ -116,7 +120,7 @@ public class InventoryCoords
         int base = (RowNumber > 0 ? (RowNumber * ROW_LENGTH) - 1 : 0);
         return base + ColumnNumber;      
     }
-    public String getCoords(){ return RowLetter + Integer.toString(ColumnNumber); }
+    @Override public String toString(){ return RowLetter + Integer.toString(ColumnNumber); }
 
     @Override
     public int hashCode() {
