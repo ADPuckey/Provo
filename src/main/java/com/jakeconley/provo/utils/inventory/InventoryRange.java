@@ -14,8 +14,18 @@ public class InventoryRange
     
     public InventoryRange(InventoryCoords _Start, InventoryCoords _End, Type _Type)
     {
-        this.Start = _Start;
-        this.End = _End;
+        // Gotta make sure this is correct on the lowest level
+        // Is this good practice or no?
+        if(_Start.getActualIndex() < _End.getActualIndex())
+        {
+            this.Start = _Start;
+            this.End = _End;
+        }
+        else
+        {
+            this.Start = _End;
+            this.End = _Start;
+        }
         this.Type = _Type;
     }
     
@@ -24,7 +34,7 @@ public class InventoryRange
         switch(type)
         {
             case SINGULAR: return v.equals(Start) || v.equals(End);
-            case LINEAR: return (v.getIndex() >= Start.getIndex() && v.getIndex() <= End.getIndex());
+            case LINEAR: return (v.getActualIndex() >= Start.getActualIndex() && v.getActualIndex() <= End.getActualIndex());
             case RECTANGULAR:
                 if(v.getRowNumber() < Start.getRowNumber() || v.getRowNumber() > End.getRowNumber()) return false;
                 return (v.getColumnNumber() >= Start.getColumnNumber() && v.getColumnNumber() <= End.getColumnNumber());

@@ -6,9 +6,7 @@ food:
   - APPLE
   - BAKED_POTATO
   - BREAD
-  - CARROT
   - CARROT_ITEM
-  #the above: wat
   - MELON
   - MUSHROOM_SOUP
   - PORK

@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Provo extends JavaPlugin
 {
-    public static boolean Debug = false;
+    public static boolean Debug = true;
     
     @Override
     public void onEnable()
