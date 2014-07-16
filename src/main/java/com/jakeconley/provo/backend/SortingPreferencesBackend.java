@@ -1,9 +1,13 @@
 package com.jakeconley.provo.backend;
 
+import java.util.List;
+
 public class SortingPreferencesBackend
 {
-    public static boolean FetchPublicItemGroups()
+    public static List<String> FetchPublicItemGroups() throws Exception
     {
-        Yaml itemgroups = new Yaml("");
+        Yaml itemgroups = new Yaml("plugins/Provo/sorting/itemgroups.yml");
+        itemgroups.LoadWithDefault("/itemgroups.yml");
+        return itemgroups.get().getStringList("");
     }
 }

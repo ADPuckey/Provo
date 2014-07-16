@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Yaml
@@ -22,7 +23,7 @@ public class Yaml
     }
     
     // Shamelessly stole this from a bukkit tutorial
-    public static boolean CopyTo(InputStream in, File file)
+    public static boolean CopyTo(InputStream in, File file) throws Exception
     {
         try
         {
@@ -40,51 +41,48 @@ public class Yaml
         catch (Exception e) 
         {
             Utils.LogException("while copying default YAML", e);
-            return false;
+            throw e;
         }
     }
     
-    public boolean Load()
+    public void Load() throws Exception
     {
-        try
-        {            
-            Yaml.load(this.File);
-            return true;
+        try{ Yaml.load(this.File); }
+        catch(InvalidConfigurationException e)
+        {
+            Utils.Severe("Invalid configuration on file " + this.File.getName() + ".  Check your YAML.");
+            throw e;
         }
         catch(Exception e)
         {
-            Utils.LogException("loading YAML " + this.File.getName(), e);
-            return false;
+            Utils.Severe("Error loading YAML " + this.File.getName() + ": " + e.toString());
+            throw e;
         }
     }
     /**
      * Load the file, and if it doesn't exist, copy it from a default path within the jar
      * @param defpath Path to copy from
-     * @return True if successful
+     * @throws java.lang.Exception
      */
-    public boolean LoadWithDefault(String defpath)
+    public void LoadWithDefault(String defpath) throws Exception
     {
         if(!File.exists())
         {
             Utils.Warning("YAML " + File.getName() + " does not exist, attempting to create default...");
-            if(!CopyTo(this.getClass().getResourceAsStream(defpath), File)) return false;
+            CopyTo(this.getClass().getResourceAsStream(defpath), File);
             Utils.Info("Creation successful.");
         }
         
-        return this.Load();
+        this.Load();
     }
     
-    public boolean SaveFile()
+    public void SaveFile() throws Exception
     {
-        try
-        {
-            Yaml.save(this.File);
-            return true;
-        }
+        try{ Yaml.save(this.File); }
         catch(Exception e)
         {
-            Utils.LogException("saving YAML " + File.getName(), e);
-            return false;
+            Utils.Severe("Error saving YAML " + File.getName() + ": " + e.toString());
+            throw e;
         }
     }
 }
