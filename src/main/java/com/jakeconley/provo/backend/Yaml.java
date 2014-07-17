@@ -25,9 +25,8 @@ public class Yaml
     // Shamelessly stole this from a bukkit tutorial
     public static boolean CopyTo(InputStream in, File file) throws Exception
     {
-        try
+        try(OutputStream out = new FileOutputStream(file))
         {
-            OutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
             int len;
             while((len=in.read(buf))>0)
@@ -71,6 +70,17 @@ public class Yaml
             Utils.Warning("YAML " + File.getName() + " does not exist, attempting to create default...");
             CopyTo(this.getClass().getResourceAsStream(defpath), File);
             Utils.Info("Creation successful.");
+        }
+        
+        this.Load();
+    }
+    public void LoadDefaultNew() throws Exception
+    {
+        try{ if(!File.exists()) File.createNewFile(); }
+        catch(Exception e)
+        {
+            Utils.Severe("Could not create new file: " + e.toString());
+            throw e;
         }
         
         this.Load();

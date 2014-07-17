@@ -12,6 +12,10 @@ public class Settings
     private File SettingsFile = new File("plugins/Provo/config.yml");
     public YamlConfiguration SettingsYaml = new YamlConfiguration();
     
+    public int Sorting_MaxClasses;
+    public int Sorting_MaxRulesPerClass;
+    public boolean Sorting_MRPC_IncludeHotbar;
+    
     // Shamelessly stole this from a bukkit tutorial
     private boolean copy(InputStream in, File file)
     {
@@ -35,7 +39,13 @@ public class Settings
         }
     }
     
-    public boolean LoadFile()
+    public void AnalyzeConfig()
+    {
+        Sorting_MaxClasses          = SettingsYaml.getInt("sorting.max-classes", -1);
+        Sorting_MaxRulesPerClass    = SettingsYaml.getInt("sorting.max-rules-per-class", -1);
+        Sorting_MRPC_IncludeHotbar  = SettingsYaml.getBoolean("sorting.max-rules-per-class_include-hotbar", false);
+    }
+    public boolean LoadFile(boolean analyze)
     {
         if(!SettingsFile.exists())
         {
@@ -50,6 +60,7 @@ public class Settings
         try
         {            
             SettingsYaml.load(SettingsFile);
+            if(analyze) this.AnalyzeConfig();
             return true;
         }
         catch(Exception e)

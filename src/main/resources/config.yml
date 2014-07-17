@@ -1,0 +1,9 @@
+debug: false
+sorting:
+  # Limits for players without the provo.sorting.ignorelimits permission node
+  # Use the # character before the limits (comment them out) or set them to -1 to remove them.
+  # See the README or official page for more information.
+  max-classes: 5
+  max-rules-per-class: 10
+  max-rules-per-class_include-hotbar: false
+  
