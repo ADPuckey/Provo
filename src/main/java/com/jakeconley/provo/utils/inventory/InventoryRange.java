@@ -14,30 +14,42 @@ public class InventoryRange
     
     public InventoryRange(InventoryCoords _Start, InventoryCoords _End, Type _Type)
     {
-        // Gotta make sure this is correct on the lowest level
-        // Is this good practice or no?
-        if(_Start.getActualIndex() < _End.getActualIndex())
-        {
-            this.Start = _Start;
-            this.End = _End;
-        }
-        else
-        {
-            this.Start = _End;
-            this.End = _Start;
-        }
+        this.Start = _Start;
+        this.End = _End;
         this.Type = _Type;
     }
     
-    public boolean Contains(InventoryCoords v, Type type)
+    // Not sure why i did separate methods but oh well
+    private boolean Contains(InventoryCoords v, Type type)
     {
         switch(type)
         {
             case SINGULAR: return v.equals(Start) || v.equals(End);
-            case LINEAR: return (v.getActualIndex() >= Start.getActualIndex() && v.getActualIndex() <= End.getActualIndex());
+            case LINEAR:
+                int big;
+                int mid = v.getActualIndex();
+                int lil;
+                
+                if(Start.getActualIndex() < End.getActualIndex()){ lil = Start.getActualIndex(); big = End.getActualIndex(); }
+                else{ lil = End.getActualIndex(); big = Start.getActualIndex(); }
+                return (lil <= mid && mid <= big);
             case RECTANGULAR:
-                if(v.getRowNumber() < Start.getRowNumber() || v.getRowNumber() > End.getRowNumber()) return false;
-                return (v.getColumnNumber() >= Start.getColumnNumber() && v.getColumnNumber() <= End.getColumnNumber());
+                // Test Columns
+                int bigrow;
+                int midrow = v.getRowNumber();
+                int lilrow;
+                if(Start.getRowNumber() < End.getRowNumber()){ lilrow = Start.getRowNumber(); bigrow = End.getRowNumber(); }
+                else{ lilrow = End.getRowNumber(); bigrow = Start.getRowNumber(); }
+                if(!(lilrow <= midrow && midrow <= bigrow)) return false;
+                
+                int bigcol;
+                int midcol = v.getColumnNumber();
+                int lilcol;
+                if(Start.getColumnNumber() < End.getColumnNumber()){ lilcol = Start.getColumnNumber(); bigcol = End.getColumnNumber(); }
+                else{ lilcol = End.getColumnNumber(); bigcol = Start.getColumnNumber(); }
+                if(!(lilcol <= midcol && midcol <= bigcol)) return false;
+                
+                return true;
             default: return false;// Why do i have to have a default here.  i hate java
         }
     }
