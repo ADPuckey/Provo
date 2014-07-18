@@ -54,6 +54,8 @@ public class SortingPreferencesBackend
         YamlFile y = new YamlFile("plugins/Provo/sorting/player_classes/" + uuid + ".yml");
         y.LoadDefaultNew();
         
+        if(y.get().getConfigurationSection(name) == null) return null;
+                
         InventoryType inventorytype;
         try{ inventorytype = InventoryType.valueOf(y.get().getString(name + ".type", null)); }
         catch(Exception e)
@@ -66,6 +68,38 @@ public class SortingPreferencesBackend
         List<PreferencesRule> rules = new LinkedList<>();
         try{ for(ConfigurationSection i : y.get().SectionalizeMapList(name + ".rules")){ rules.add(PreferencesRuleFromYaml(i, inventorytype)); } }
         catch(ProvoFormatException e){ e.setFilePath(y.getFile().getPath()); throw e; }
+        
+        y.get().DesectionalizeMapList(name + ".rules");
+        Utils.Debug("DESECTIONALIZE\r\n" + y.get().saveToString());
+        
+        // Inheritance
+        String inheritee = y.get().getString(name + ".inherits");
+        if(inheritee != null)
+        {
+            PreferencesClass inherit = FetchPlayerPreferencesClass(uuid, inheritee);
+            if(inherit == null)
+            {
+                Utils.Warning("Couldn't find inherited class " + inheritee + " in file " + y.getFile().getPath());
+                Utils.Warning("Deleting inheritance and continuing...");
+                y.get().set(name + ".inherits", null);
+                Utils.Debug("REMOVE INHERITANCE\r\n" + y.get().saveToString());
+            }
+            else
+            {
+                int highest = 0;
+                // Calculate highest priority, then subtract that from all rules to make inherited priorities negative
+                for(PreferencesRule rule : inherit.getRules()){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
+                for(PreferencesRule rule : inherit.getRules())
+                {
+                    // Generate the new rule and add it to the rules
+                    PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getType());
+                    rule.setPriority(rule.getPriority() - highest - 1);
+                    rule.setInherited(true);
+                    rule.setInheritedFrom(inheritee);
+                    rules.add(rule);
+                }
+            }
+        }
         
         return new PreferencesClass(name, inventorytype, rules);
     }
