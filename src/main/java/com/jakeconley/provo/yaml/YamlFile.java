@@ -1,4 +1,4 @@
-package com.jakeconley.provo.backend;
+package com.jakeconley.provo.yaml;
 
 import com.jakeconley.provo.utils.Utils;
 import java.io.File;
@@ -6,20 +6,19 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-public class Yaml
+public class YamlFile
 {
     File File;
-    YamlConfiguration Yaml;
+    Yaml Yaml;
     
     public File getFile(){ return File; }
-    public YamlConfiguration get(){ return Yaml; }
+    public Yaml get(){ return Yaml; }
     
-    public Yaml(String path)
+    public YamlFile(String path)
     {
         File = new File(path);
-        Yaml = new YamlConfiguration();
+        Yaml = new Yaml();
     }
     
     // Shamelessly stole this from a bukkit tutorial

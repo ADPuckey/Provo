@@ -54,4 +54,6 @@ public class InventoryRange
         }
     }
     public boolean Contains(InventoryCoords v){ return Contains(v, this.Type); }
+    
+    @Override public String toString(){ return Start.toString() + "-" + End.toString() + " " + Type.toString(); }
 }
