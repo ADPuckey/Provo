@@ -1,0 +1,23 @@
+base:
+  type: PLAYER
+  rules:
+    -
+      area_ini: D1
+      area_fin: D1
+      area_type: SINGULAR
+      type: sword
+    -
+      area_ini: D2
+      area_fin: D2
+      area_type: SINGULAR
+      type: shovel
+    -
+      area_ini: D3
+      area_fin: D3
+      area_type: SINGULAR
+      type: pickaxe
+    -
+      area_ini: D9
+      area_fin: D9
+      area_type: SINGULAR
+      type: torch

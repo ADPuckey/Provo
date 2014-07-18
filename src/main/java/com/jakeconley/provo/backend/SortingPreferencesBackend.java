@@ -7,25 +7,36 @@ import com.jakeconley.provo.utils.inventory.InventoryCoords;
 import com.jakeconley.provo.utils.inventory.InventoryRange;
 import com.jakeconley.provo.utils.inventory.InventoryType;
 import com.jakeconley.provo.yaml.YamlFile;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class SortingPreferencesBackend
 {
-    public Set<String> FetchPublicItemGroups() throws Exception
+    public YamlFile LoadPublicItemGroupsYaml() throws Exception
     {
         YamlFile itemgroups = new YamlFile("plugins/Provo/sorting/itemgroups.yml");
-        itemgroups.LoadWithDefault("/itemgroups.yml");
-        return itemgroups.get().getKeys(false);
+        itemgroups.LoadWithDefault("/sorting_defaults/itemgroups.yml");
+        return itemgroups;
+    }
+    public YamlFile LoadPlayerClassesYaml(String uuid) throws Exception
+    {        
+        YamlFile y = new YamlFile("plugins/Provo/sorting/player_classes/" + uuid + ".yml");
+        y.LoadWithDefault("/sorting_defaults/player_class.yml");
+        return y;
+    }
+    
+    
+    public Set<String> FetchPublicItemGroups() throws Exception
+    {
+        return LoadPublicItemGroupsYaml().get().getKeys(false);
     }
     public List<String> FetchPublicItemGroup(String name) throws Exception
     {
-        YamlFile itemgroups = new YamlFile("plugins/Provo/sorting/itemgroups.yml");
-        itemgroups.LoadWithDefault("/itemgroups.yml");
-        return itemgroups.get().getStringList(name);
+        return LoadPublicItemGroupsYaml().get().getStringList(name);
     }
     
     public PreferencesRule PreferencesRuleFromYaml(ConfigurationSection section, InventoryType it) throws ProvoFormatException
@@ -42,18 +53,24 @@ public class SortingPreferencesBackend
         InventoryRange range = new InventoryRange(area_ini, area_fin, rangetype);
         return new PreferencesRule(section.getInt("priority", 1), range, section.getString("type", "any"));
     }
+    public Map<String, Object> PreferencesRuleToYaml(PreferencesRule pref)
+    {
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("area_ini", pref.getTargetArea().getStart().toString());
+        ret.put("area_fin", pref.getTargetArea().getEnd().toString());
+        ret.put("area_type", pref.getTargetArea().getType().toString());
+        if(pref.getPriority() != 1) ret.put("priority", pref.getPriority());
+        ret.put("type", pref.getType());
+        return ret;
+    }
     
     public Set<String> FetchPlayerPreferencesClasses(String uuid) throws Exception
     {
-        YamlFile y = new YamlFile("plugins/Provo/sorting/player_classes/" + uuid + ".yml");
-        y.LoadDefaultNew();
-        return y.get().getKeys(false);
+        return LoadPlayerClassesYaml(uuid).get().getKeys(false);
     }    
     public PreferencesClass FetchPlayerPreferencesClass(String uuid, String name) throws ProvoFormatException, Exception
     {
-        YamlFile y = new YamlFile("plugins/Provo/sorting/player_classes/" + uuid + ".yml");
-        y.LoadDefaultNew();
-        
+        YamlFile y = LoadPlayerClassesYaml(uuid);        
         if(y.get().getConfigurationSection(name) == null) return null;
                 
         InventoryType inventorytype;
@@ -65,31 +82,32 @@ public class SortingPreferencesBackend
             throw ex;
         }
         
+        // Sectionalize and parse preferences rules
         List<PreferencesRule> rules = new LinkedList<>();
         try{ for(ConfigurationSection i : y.get().SectionalizeMapList(name + ".rules")){ rules.add(PreferencesRuleFromYaml(i, inventorytype)); } }
         catch(ProvoFormatException e){ e.setFilePath(y.getFile().getPath()); throw e; }
         
         y.get().DesectionalizeMapList(name + ".rules");
-        Utils.Debug("DESECTIONALIZE\r\n" + y.get().saveToString());
         
         // Inheritance
         String inheritee = y.get().getString(name + ".inherits");
+        PreferencesClass inheriteeclass = null;
         if(inheritee != null)
         {
-            PreferencesClass inherit = FetchPlayerPreferencesClass(uuid, inheritee);
-            if(inherit == null)
+            inheriteeclass = FetchPlayerPreferencesClass(uuid, inheritee);
+            if(inheriteeclass == null)
             {
                 Utils.Warning("Couldn't find inherited class " + inheritee + " in file " + y.getFile().getPath());
                 Utils.Warning("Deleting inheritance and continuing...");
                 y.get().set(name + ".inherits", null);
-                Utils.Debug("REMOVE INHERITANCE\r\n" + y.get().saveToString());
+                y.SaveFile();
             }
             else
-            {
+            {          
                 int highest = 0;
                 // Calculate highest priority, then subtract that from all rules to make inherited priorities negative
-                for(PreferencesRule rule : inherit.getRules()){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
-                for(PreferencesRule rule : inherit.getRules())
+                for(PreferencesRule rule : inheriteeclass.getRules()){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
+                for(PreferencesRule rule : inheriteeclass.getRules())
                 {
                     // Generate the new rule and add it to the rules
                     PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getType());
@@ -101,12 +119,65 @@ public class SortingPreferencesBackend
             }
         }
         
-        return new PreferencesClass(name, inventorytype, rules);
+        PreferencesClass ret = new PreferencesClass(name, inventorytype, rules);
+        if(inheriteeclass != null) ret.setInheritee(inheritee);
+        return ret;
     }
-    public void WritePreferencesClass(String uuid, PreferencesClass v) throws Exception
+    public void WritePreferencesClass(String uuid, PreferencesClass pclass) throws Exception
     {
-        //TODO: "getpath" function or some shit
-        YamlFile y = new YamlFile("plugins/Provo/sorting/player_classes/" + uuid + ".yml");
-        y.LoadDefaultNew();
+        YamlFile y = LoadPlayerClassesYaml(uuid);        
+        if(y.get().getConfigurationSection(pclass.getName()) != null) return;//if already exists
+        
+        ConfigurationSection newsection = y.get().createSection(pclass.getName());
+        newsection.set("type", pclass.getTargetType().toString());        
+        if(pclass.getInheritee() != null) newsection.set("inheritee", pclass.getInheritee());
+        
+        List<Map<String, Object>> yaml_rulelist = new LinkedList<>();
+        for(PreferencesRule rule : pclass.getRules()){ yaml_rulelist.add(PreferencesRuleToYaml(rule)); }
+        newsection.set("rules", yaml_rulelist);
+        
+        y.SaveFile();
+    }
+    public void DeletePreferencesClass(String uuid, String name) throws Exception
+    {
+        YamlFile y = LoadPlayerClassesYaml(uuid);
+        y.get().set(name, null);
+        y.SaveFile();
+    }
+    
+    public void WritePreferencesRule(String uuid, String classname, PreferencesRule rule) throws Exception
+    {
+        YamlFile y = LoadPlayerClassesYaml(uuid);
+        if(y.get().getConfigurationSection(classname) == null)
+        {
+            ProvoNotFoundException e = new ProvoNotFoundException("class " + classname);
+            e.FilePath = y.getFile().getPath();
+            throw e;
+        }
+        
+        List<Map<?,?>> maplist = y.get().getMapList(classname + ".rules");
+        maplist.add(PreferencesRuleToYaml(rule));
+        y.get().set(classname + ".rules", maplist);
+        
+        y.SaveFile();
+    }
+    public void DeletePreferencesRule(String uuid, String classname, int ruleindex) throws Exception
+    {
+        YamlFile y = LoadPlayerClassesYaml(uuid);  
+        if(y.get().getConfigurationSection(classname) == null)
+        {
+            ProvoNotFoundException e = new ProvoNotFoundException("class " + classname);
+            e.FilePath = y.getFile().getPath();
+            throw e;
+        }
+        
+        final String RULES = classname + ".rules";
+        y.get().SectionalizeMapList(RULES);
+        ConfigurationSection rules = y.get().getConfigurationSection(RULES);
+        if(rules.getConfigurationSection(Integer.toString(ruleindex)) == null) return;
+        rules.set(Integer.toString(ruleindex), null);
+        y.get().DesectionalizeMapList(RULES);
+        
+        y.SaveFile();
     }
 }

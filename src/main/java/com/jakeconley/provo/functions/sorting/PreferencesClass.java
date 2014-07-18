@@ -8,11 +8,15 @@ public class PreferencesClass
 {
     private String Name;
     private final InventoryType TargetType;
-    private final List<PreferencesRule> Rules;   
+    private final List<PreferencesRule> Rules;
+    private String Inheritee;
+    
     public String getName(){ return Name; }
     public InventoryType getTargetType(){ return TargetType; }
     public List<PreferencesRule> getRules(){ return Rules; }
+    public String getInheritee(){ return Inheritee; }
     public void setName(String value){ Name = value; }
+    public void setInheritee(String value){ Inheritee = value; }
     public boolean addRule(PreferencesRule value){ return Rules.add(value); }
     public boolean removeRule(PreferencesRule value){ return Rules.remove(value); }
     

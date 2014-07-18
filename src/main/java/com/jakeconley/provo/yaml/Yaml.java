@@ -15,7 +15,7 @@ public class Yaml extends YamlConfiguration
     public List<ConfigurationSection> SectionalizeMapList(String path)
     {
         List<Map<?,?>> list = this.getMapList(path);
-        if(list == null) return null;
+        if(list == null) return new LinkedList<>();
         
         List<ConfigurationSection> ret = new LinkedList<>();
         
