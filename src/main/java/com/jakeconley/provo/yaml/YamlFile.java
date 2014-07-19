@@ -88,13 +88,11 @@ public class YamlFile
     public void SaveFile() throws Exception
     {
         Utils.Debug("SAVING YAML\r\n" + Yaml.saveToString());
-        /*
         try{ Yaml.save(this.File); }
         catch(Exception e)
         {
             Utils.Severe("Error saving YAML " + File.getName() + ": " + e.toString());
             throw e;
         }
-                */
     }
 }

@@ -130,7 +130,7 @@ public class SortingPreferencesBackend
         
         ConfigurationSection newsection = y.get().createSection(pclass.getName());
         newsection.set("type", pclass.getTargetType().toString());        
-        if(pclass.getInheritee() != null) newsection.set("inheritee", pclass.getInheritee());
+        if(pclass.getInheritee() != null) newsection.set("inherits", pclass.getInheritee());
         
         List<Map<String, Object>> yaml_rulelist = new LinkedList<>();
         for(PreferencesRule rule : pclass.getRules()){ yaml_rulelist.add(PreferencesRuleToYaml(rule)); }
@@ -161,7 +161,16 @@ public class SortingPreferencesBackend
         
         y.SaveFile();
     }
-    public void DeletePreferencesRule(String uuid, String classname, int ruleindex) throws Exception
+    /**
+     * Delete a preferencesrule by its numeric index
+     * @param uuid UUID of the owner of the rule
+     * @param classname Class the rule is in
+     * @param ruleindex Index of the rule
+     * @return True if successful, false if no such rule was found
+     * @throws ProvoNotFoundException If the class is not found
+     * @throws Exception Miscellaneous error
+     */
+    public boolean DeletePreferencesRule(String uuid, String classname, int ruleindex) throws Exception
     {
         YamlFile y = LoadPlayerClassesYaml(uuid);  
         if(y.get().getConfigurationSection(classname) == null)
@@ -174,10 +183,11 @@ public class SortingPreferencesBackend
         final String RULES = classname + ".rules";
         y.get().SectionalizeMapList(RULES);
         ConfigurationSection rules = y.get().getConfigurationSection(RULES);
-        if(rules.getConfigurationSection(Integer.toString(ruleindex)) == null) return;
+        if(rules.getConfigurationSection(Integer.toString(ruleindex)) == null) return false;
         rules.set(Integer.toString(ruleindex), null);
         y.get().DesectionalizeMapList(RULES);
         
         y.SaveFile();
+        return true;
     }
 }
