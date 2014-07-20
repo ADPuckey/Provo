@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class SortingPreferencesBackend
@@ -29,15 +30,85 @@ public class SortingPreferencesBackend
         return y;
     }
     
+    //                   //
+    // -- Item Groups -- //
+    //                   //
     
-    public Set<String> FetchPublicItemGroups() throws Exception
+    /*
+        Okay so eventually players are supposed to be able to make their own item groups
+        That's why we have a UUID parameter everywhere, to account for when that's gonna happen
+        Or in the case of GetItemGroup, a "priv" YamlFile
+    */
+    
+    private Material StringToMaterial(String s, String filepath)
     {
-        return LoadPublicItemGroupsYaml().get().getKeys(false);
+        Material m = Material.matchMaterial(s);
+
+        // MATERIAL FIXES GO HERE
+        if(s.equalsIgnoreCase("carrot")) m = Material.CARROT_ITEM;
+
+        if(m == null)
+        {
+            Utils.Warning("Invalid material name \"" + s + "\" in file " + filepath + "");
+            return null;
+        }
+        return m;
     }
-    public List<String> FetchPublicItemGroup(String name) throws Exception
+    
+    private LinkedList<Material> GetItemGroup(YamlFile pub, YamlFile priv, String name) throws Exception
     {
-        return LoadPublicItemGroupsYaml().get().getStringList(name);
+        LinkedList<Material> ret = new LinkedList();
+        
+        // The below needs srs migration later
+        ConfigurationSection section = pub.get().getConfigurationSection(name);
+        
+        List<String> unparsed = section.getStringList("items");
+        if(unparsed != null && !unparsed.isEmpty()){ for(String s : unparsed){
+            Material m = StringToMaterial(s, pub.getFile().getPath());
+            if(m != null) ret.add(m);
+        }}
+        
+        List<String> inheritance = section.getStringList("inherits");// to be inherited
+        LinkedList<String> ya_inherited = new LinkedList<>();// to prevent linking twice
+        
+        // Resolve inheritance
+        for(String s : inheritance)
+        {
+            for(Material m : GetItemGroup(pub, priv, s)){ ret.add(m); }
+        }
+        
+        return ret;
     }
+    public HashMap<String,LinkedList<Material>> FetchItemGroups(String uuid) throws Exception
+    {
+        YamlFile groups = LoadPublicItemGroupsYaml();
+        HashMap<String,LinkedList<Material>> ret = new HashMap<>();
+        
+        
+        // Get groups
+        for(String s : groups.get().getKeys(false))
+        {
+            ret.put(s, GetItemGroup(groups, null, s));
+        }
+        
+        return ret;
+    }
+    /**
+     * For frontend validation.
+     * @param uuid Param UUID will be added when player-made item groups exist, irrelevant for now
+     * @param group Name of the group to check for
+     * @return Whether or not the item group exists and is valid
+     * @throws Exception 
+     */
+    public boolean ItemGroupExists(String uuid, String group) throws Exception
+    {
+        YamlFile file = LoadPublicItemGroupsYaml();
+        return (file.get().getConfigurationSection(group) != null);
+    }
+    
+    //                         //
+    // -- Preferences rules -- //
+    //                         //
     
     public PreferencesRule PreferencesRuleFromYaml(ConfigurationSection section, InventoryType it) throws ProvoFormatException
     {

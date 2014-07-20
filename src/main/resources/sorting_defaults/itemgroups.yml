@@ -1,12 +1,19 @@
 # Reserved: blocks, items, edible, flammable, burnable
+food_meat:
+  items:
+    - cooked beef
+    - cooked chicken
+    - cooked fish
+    - pork
+food_other:
+  items:
+    - apple
+    - baked potato
+    - bread
+    - carrot
+    - melon
+    - mushroom soup
 food:
-  - COOKED_BEEF
-  - COOKED_CHICKEN
-  - COOKED_FISH
-  - APPLE
-  - BAKED_POTATO
-  - BREAD
-  - CARROT_ITEM
-  - MELON
-  - MUSHROOM_SOUP
-  - PORK
+  inherits:
+    - food_meat
+    - food_other

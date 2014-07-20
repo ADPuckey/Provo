@@ -4,3 +4,10 @@ description: A collection of useful commands and functions
 author: HAPPYGOPUCKEY
 website: http://jakeconley.com
 main: com.jakeconley.provo.Provo
+commands:
+  sorting:
+    description: Manage your sorting preferences.
+    usage:  See /sorting help for more information.
+  sort:
+    description: Sort an inventory!  See /sorting help for more information
+    usage: /sort [class]

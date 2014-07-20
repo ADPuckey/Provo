@@ -1,6 +1,8 @@
 package com.jakeconley.provo.functions.sorting;
 
 import com.jakeconley.provo.utils.inventory.InventoryRange;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Objects;
 import org.bukkit.Material;
 
@@ -30,7 +32,7 @@ public class PreferencesRule
         Type = _ItemGroupName;
     }
     
-    public boolean MatchesMaterial(Material m)
+    public boolean MatchesMaterial(Material m, HashMap<String, LinkedList<Material>> itemgroups)
     {
         if(Type.equals("any")) return true;
         if(Type.equals("blocks")) return m.isBlock();
@@ -38,6 +40,9 @@ public class PreferencesRule
         if(Type.equals("edible")) return m.isEdible();
         if(Type.equals("flammable")) return m.isFlammable();
         if(Type.equals("burnable")) return m.isBurnable();
+        
+        LinkedList<Material> group = itemgroups.get(Type);
+        if(group != null){ if(group.contains(m)) return true; }
         
         return false;
     }

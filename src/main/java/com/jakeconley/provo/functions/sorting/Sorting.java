@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -53,7 +54,8 @@ public class Sorting
 	return collapsed;
     }
     
-    public static void SortInventory(Inventory inventory, PreferencesClass pclass)
+    // TODO: StrongestSet for tools
+    public static Inventory SortInventory(Inventory inventory, PreferencesClass pclass, HashMap<String, LinkedList<Material>> itemgroups)
     {
 	// Initial lists, sort and collapse
 	// `collapsed` acts as a queue of items to be sorting.  its entry is set to null whenever the item is assigned a spot.
@@ -122,7 +124,7 @@ public class Sorting
 	    ItemStack stack = collapsed.get(i);
 	    if(stack == null) continue;
 	    
-	    for(PreferencesRule rule : rules){ if(rule.MatchesMaterial(stack.getType())){
+	    for(PreferencesRule rule : rules){ if(rule.MatchesMaterial(stack.getType(), itemgroups)){
 		if(claimedIndices.get(rule).isEmpty()) break;//no more fillable spaces
 		
 		int newindex = claimedIndices.get(rule).get(0);
@@ -160,6 +162,8 @@ public class Sorting
 	}
 	
 	// Slick, finally done smh
-	inventory.setContents(result);
+        Inventory ret = inventory;
+	ret.setContents(result);
+        return ret;
     }
 }
