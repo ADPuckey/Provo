@@ -1,6 +1,7 @@
 package com.jakeconley.provo.functions.sorting;
 
 import com.jakeconley.provo.utils.inventory.InventoryRange;
+import java.util.Objects;
 import org.bukkit.Material;
 
 public class PreferencesRule
@@ -28,7 +29,6 @@ public class PreferencesRule
         TargetArea = _TargetArea;
         Type = _ItemGroupName;
     }
-
     
     public boolean MatchesMaterial(Material m)
     {
@@ -41,4 +41,40 @@ public class PreferencesRule
         
         return false;
     }
+
+    @Override
+    public int hashCode() {
+	int hash = 7;
+	hash = 31 * hash + this.Priority;
+	hash = 31 * hash + Objects.hashCode(this.TargetArea);
+	hash = 31 * hash + Objects.hashCode(this.Type);
+	hash = 31 * hash + Objects.hashCode(this.InheritedFrom);
+	return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null) {
+	    return false;
+	}
+	if (getClass() != obj.getClass()) {
+	    return false;
+	}
+	final PreferencesRule other = (PreferencesRule) obj;
+	if (this.Priority != other.Priority) {
+	    return false;
+	}
+	if (!Objects.equals(this.TargetArea, other.TargetArea)) {
+	    return false;
+	}
+	if (!Objects.equals(this.Type, other.Type)) {
+	    return false;
+	}
+	if (!Objects.equals(this.InheritedFrom, other.InheritedFrom)) {
+	    return false;
+	}
+	return true;
+    }
+    
+    
 }

@@ -9,14 +9,14 @@ public class CraftedUtility
     }
     public enum ItemMaterial
     {
-        WOOD(0), LEATHER(0), STONE(1), CHAINMAIL(1), IRON(2), GOLD(3), DIAMOND(4);
+        WOOD(0), LEATHER(0), GOLD_ARMOR(1), STONE(1), CHAINMAIL(2), IRON(3), GOLD_TOOLS(4), DIAMOND(5);
         
         public int Index;
         ItemMaterial(int _Index){ this.Index = _Index; }
     }
     
-    public Item Type;
-    public ItemMaterial Quality;
+    private final Item Type;
+    private final ItemMaterial Quality;
     public Item getItem(){ return this.Type; }
     public ItemMaterial getQuality(){ return this.Quality; }
     
@@ -39,11 +39,11 @@ case STONE_SPADE:	return new CraftedUtility(Item.TOOL_SPADE, ItemMaterial.STONE)
 case STONE_PICKAXE:	return new CraftedUtility(Item.TOOL_PICKAXE, ItemMaterial.STONE);
 case STONE_AXE: 	return new CraftedUtility(Item.TOOL_AXE, ItemMaterial.STONE);
 case STONE_HOE:     	return new CraftedUtility(Item.TOOL_HOE, ItemMaterial.STONE);
-case GOLD_SWORD:	return new CraftedUtility(Item.TOOL_SWORD, ItemMaterial.GOLD);
-case GOLD_SPADE:	return new CraftedUtility(Item.TOOL_SPADE, ItemMaterial.GOLD);
-case GOLD_PICKAXE:	return new CraftedUtility(Item.TOOL_PICKAXE, ItemMaterial.GOLD);
-case GOLD_AXE:          return new CraftedUtility(Item.TOOL_AXE, ItemMaterial.GOLD);
-case GOLD_HOE:          return new CraftedUtility(Item.TOOL_HOE, ItemMaterial.GOLD);
+case GOLD_SWORD:	return new CraftedUtility(Item.TOOL_SWORD, ItemMaterial.GOLD_TOOLS);
+case GOLD_SPADE:	return new CraftedUtility(Item.TOOL_SPADE, ItemMaterial.GOLD_TOOLS);
+case GOLD_PICKAXE:	return new CraftedUtility(Item.TOOL_PICKAXE, ItemMaterial.GOLD_TOOLS);
+case GOLD_AXE:          return new CraftedUtility(Item.TOOL_AXE, ItemMaterial.GOLD_TOOLS);
+case GOLD_HOE:          return new CraftedUtility(Item.TOOL_HOE, ItemMaterial.GOLD_TOOLS);
 case DIAMOND_SWORD:	return new CraftedUtility(Item.TOOL_SWORD, ItemMaterial.DIAMOND);
 case DIAMOND_SPADE:	return new CraftedUtility(Item.TOOL_SPADE, ItemMaterial.DIAMOND);
 case DIAMOND_PICKAXE:	return new CraftedUtility(Item.TOOL_PICKAXE, ItemMaterial.DIAMOND);
@@ -55,16 +55,16 @@ case LEATHER_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMateri
 case LEATHER_BOOTS:	return new CraftedUtility(Item.ARMOR_BOOTS, ItemMaterial.LEATHER);
 case CHAINMAIL_HELMET:	return new CraftedUtility(Item.ARMOR_HELMET, ItemMaterial.CHAINMAIL);
 case CHAINMAIL_CHESTPLATE:return new CraftedUtility(Item.ARMOR_CHESTPLATE, ItemMaterial.CHAINMAIL);// toOO LONG, PISS
-case CHAINMAIL_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.CHAINMAIL);
+case CHAINMAIL_LEGGINGS:return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.CHAINMAIL);
 case CHAINMAIL_BOOTS:	return new CraftedUtility(Item.ARMOR_BOOTS, ItemMaterial.CHAINMAIL);
 case IRON_HELMET:	return new CraftedUtility(Item.ARMOR_HELMET, ItemMaterial.IRON);
 case IRON_CHESTPLATE:	return new CraftedUtility(Item.ARMOR_CHESTPLATE, ItemMaterial.IRON);
 case IRON_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.IRON);
 case IRON_BOOTS:    	return new CraftedUtility(Item.ARMOR_BOOTS, ItemMaterial.IRON);
-case GOLD_HELMET:	return new CraftedUtility(Item.ARMOR_HELMET, ItemMaterial.GOLD);
-case GOLD_CHESTPLATE:	return new CraftedUtility(Item.ARMOR_CHESTPLATE, ItemMaterial.GOLD);
-case GOLD_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.GOLD);
-case GOLD_BOOTS:        	return new CraftedUtility(Item.ARMOR_BOOTS, ItemMaterial.GOLD);
+case GOLD_HELMET:	return new CraftedUtility(Item.ARMOR_HELMET, ItemMaterial.GOLD_ARMOR);
+case GOLD_CHESTPLATE:	return new CraftedUtility(Item.ARMOR_CHESTPLATE, ItemMaterial.GOLD_ARMOR);
+case GOLD_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.GOLD_ARMOR);
+case GOLD_BOOTS:        return new CraftedUtility(Item.ARMOR_BOOTS, ItemMaterial.GOLD_ARMOR);
 case DIAMOND_HELMET:	return new CraftedUtility(Item.ARMOR_HELMET, ItemMaterial.DIAMOND);
 case DIAMOND_CHESTPLATE:return new CraftedUtility(Item.ARMOR_CHESTPLATE, ItemMaterial.DIAMOND);
 case DIAMOND_LEGGINGS:	return new CraftedUtility(Item.ARMOR_LEGGINGS, ItemMaterial.DIAMOND);
