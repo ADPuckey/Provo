@@ -18,9 +18,7 @@ public class Utils
     
     public static void LogException(String action, Exception e)
     {
-        Severe("Error " + action + ":");
-        Severe(e.toString());
-        Severe(e.getMessage());
+        if(action != null) Severe("Error " + action + ":");
         e.printStackTrace();
     }
     public static void Info(String message){ log.info("[Provo] " + message); }

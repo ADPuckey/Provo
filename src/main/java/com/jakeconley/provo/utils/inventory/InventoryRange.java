@@ -2,7 +2,7 @@ package com.jakeconley.provo.utils.inventory;
 
 public class InventoryRange
 {
-    public enum Type{ SINGULAR, LINEAR, RECTANGULAR }
+    public static enum Type{ SINGULAR, LINEAR, RECTANGULAR }
     
     private Type Type;
     private InventoryCoords Start = null;

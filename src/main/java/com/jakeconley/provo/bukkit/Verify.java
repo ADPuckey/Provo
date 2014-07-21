@@ -1,6 +1,7 @@
-package com.jakeconley.provo.utils;
+package com.jakeconley.provo.bukkit;
 
 import com.jakeconley.provo.Provo;
+import com.jakeconley.provo.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,25 +20,13 @@ public class Verify
         
         s.sendMessage(ChatColor.YELLOW + "You don't have permission to do that.");
         return false;
-    }
+    }   
     
-    public static boolean IsPlayer(CommandSender s)
-    {
-        if(s instanceof Player) return true;
-        s.sendMessage("You can only do that from in-game.");
-        return false;
-    }    
     public static boolean ArgsLength(Command c, CommandSender cs, String[] args, int arg_len, String message)
     {
         if(args.length >= arg_len) return true;
-        if(message == null) cs.sendMessage(ChatColor.RED + "Usage: " + c.getUsage());
+        if(message == null) Messages.Usage(cs, c.getUsage());
         else cs.sendMessage(ChatColor.RED + "Usage: " + message);
         return false;
-    }
-    
-    public static void ReportError(CommandSender cs, String msg)
-    {
-        cs.sendMessage(ChatColor.RED + "There was an internal plugin error, please notify an admin.");
-        Utils.Severe(msg);
     }
 }

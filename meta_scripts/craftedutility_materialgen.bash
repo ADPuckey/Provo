@@ -30,6 +30,7 @@ armor $1 "BOOTS"
 
 toolmaterial "WOOD"
 toolmaterial "STONE"
+toolmaterial "IRON"
 toolmaterial "GOLD"
 toolmaterial "DIAMOND"
 

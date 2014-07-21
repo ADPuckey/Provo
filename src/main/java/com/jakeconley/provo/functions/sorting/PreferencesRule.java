@@ -46,6 +46,9 @@ public class PreferencesRule
         
         return false;
     }
+    
+    @Override
+    public String toString(){ return "Priority " + Priority + " " + TargetArea.toString() + ": " + Type; }
 
     @Override
     public int hashCode() {

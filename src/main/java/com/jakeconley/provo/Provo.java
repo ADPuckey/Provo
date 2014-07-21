@@ -12,8 +12,8 @@ public class Provo extends JavaPlugin
     private SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
     public SortingPreferencesBackend getSortingPreferencesBackend(){ return new SortingPreferencesBackend(); }
     
-    private GeneralCommands _GeneralCommands = new GeneralCommands(this);
-    private SortingCommands _SortingCommands = new SortingCommands(this);
+    private CommandsGeneral _GeneralCommands = new CommandsGeneral(this);
+    private CommandsSorting _SortingCommands = new CommandsSorting(this);
     
     @Override
     public void onEnable()

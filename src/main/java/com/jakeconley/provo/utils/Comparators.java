@@ -10,8 +10,7 @@ public class Comparators
     {
 	@Override
 	public int compare(PreferencesRule o1, PreferencesRule o2){ return o2.getPriority() - o1.getPriority(); }
-    }
-    
+    }    
     public static class ITEMSTACK_ASCENDING implements Comparator<ItemStack>
     {
 	@Override
