@@ -9,12 +9,14 @@ import com.jakeconley.provo.functions.sorting.SortingResult;
 import com.jakeconley.provo.utils.Utils;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class CommandsSorting implements CommandExecutor
 {
@@ -54,9 +56,8 @@ if(label.equalsIgnoreCase("sort"))
             player.sendMessage(ChatColor.YELLOW + "" +  ChatColor.ITALIC + "Then" + ChatColor.RESET + ChatColor.YELLOW + " you may use /sort alone.");
             return true;
         }
-
-        pclassname = args[0];
     }
+    if(args.length >= 1) pclassname = args[0];
 
     try
     {
@@ -70,11 +71,24 @@ if(label.equalsIgnoreCase("sort"))
         CurrentClasses.put(player_uuid, pclassname);
         
         HashMap<String, LinkedList<Material>> igroups = backend.FetchItemGroups(player_uuid);
-        SortingResult res = Sorting.SortInventory(player.getInventory(), pclass, igroups);
-        player.getInventory().setArmorContents(res.ArmorContents);
-        player.getInventory().setContents(res.Contents);
         
-        player.sendMessage(ChatColor.GREEN + "Successfully sorted inventory.");
+        Utils.Debug("PRESORT:"); List<ItemStack> PreSort = Sorting.CollapseInventory(player.getInventory().getContents(), player.getInventory().getArmorContents(), null);
+        SortingResult res = Sorting.SortInventory(player.getInventory(), pclass, igroups);
+        Utils.Debug("POSTSORT:"); List<ItemStack> PostSort = Sorting.CollapseInventory(res.Contents, res.ArmorContents, null);
+        
+        if(PreSort.equals(PostSort))
+        {
+            Utils.Debug("final contents");
+            for(int i = 0; i < res.Contents.length; i++){ Utils.Debug("  " + i + ": " + (res.Contents[i] != null ? res.Contents[i].toString() : "null")); }
+            player.getInventory().clear();
+            player.getInventory().setArmorContents(res.ArmorContents);
+            player.getInventory().setContents(res.Contents);        
+            player.sendMessage(ChatColor.GREEN + "Successfully sorted inventory.");
+        }
+        else
+        {
+            player.sendMessage(ChatColor.RED + "Sort failed!");
+        }
         return true;
     }
     catch(ProvoFormatException e){ return true; }

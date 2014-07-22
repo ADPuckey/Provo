@@ -34,15 +34,15 @@ public class PreferencesRule
     
     public boolean MatchesMaterial(Material m, HashMap<String, LinkedList<Material>> itemgroups)
     {
+        LinkedList<Material> group = itemgroups.get(Type);
+        if(group != null){ if(group.contains(m)) return true; }
+        
         if(Type.equals("any")) return true;
         if(Type.equals("blocks")) return m.isBlock();
         if(Type.equals("items")) return !(m.isBlock());
         if(Type.equals("edible")) return m.isEdible();
         if(Type.equals("flammable")) return m.isFlammable();
         if(Type.equals("burnable")) return m.isBurnable();
-        
-        LinkedList<Material> group = itemgroups.get(Type);
-        if(group != null){ if(group.contains(m)) return true; }
         
         return false;
     }

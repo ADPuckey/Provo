@@ -177,12 +177,12 @@ public class SortingPreferencesBackend
             {          
                 int highest = 0;
                 // Calculate highest priority, then subtract that from all rules to make inherited priorities negative
-                for(PreferencesRule rule : inheriteeclass.getRules()){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
+                for(PreferencesRule rule : rules){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
                 for(PreferencesRule rule : inheriteeclass.getRules())
                 {
                     // Generate the new rule and add it to the rules
                     PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getType());
-                    rule.setPriority(rule.getPriority() - highest - 1);
+                    rule.setPriority(rule.getPriority() + highest);
                     rule.setInherited(true);
                     rule.setInheritedFrom(inheritee);
                     rules.add(rule);

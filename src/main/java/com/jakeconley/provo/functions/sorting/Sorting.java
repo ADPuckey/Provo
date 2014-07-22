@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -18,9 +19,9 @@ import org.bukkit.inventory.PlayerInventory;
 public class Sorting
 {    
     /**
-     * Returns a map of item types to indexes of the strongest of that type in the list provided.
+     * Returns a map of item types to indexes of the strongest_i of that type in the list provided.
      * @param list List of items to sort through
-     * @return Map of CraftedUtility.Item types to the indexes of the strongest types in the list.
+     * @return Map of CraftedUtility.Item types to the indexes of the strongest_i types in the list.
      */
     private static HashMap<CraftedUtility.Item, Integer> FindStrongestSet(List<ItemStack> list)
     {
@@ -35,7 +36,7 @@ public class Sorting
 	    // in the `parsed` map, which can be used to compare
 	    ItemStack stack = list.get(i);
 	    CraftedUtility craft = CraftedUtility.fromMaterial(stack.getType());
-	    if(craft == null) continue;//Is not a tool or armor
+	    if(craft == null) continue;//Is not a tool or ArmorContents
 	    parsed.put(i, craft);
 	    
 	    if(ret.get(craft.getItem()) == null){ ret.put(craft.getItem(), i); continue; }// If none there, as default
@@ -43,22 +44,82 @@ public class Sorting
 	}
 	return ret;
     }
-    private static List<ItemStack> CollapseInventory(Inventory inventory, HashMap<Integer, ItemStack> lockedIndices)
-    {	
-	List<ItemStack> collapsed = new ArrayList<>();
-	for(int i = 0; i < inventory.getSize(); i++)
+    
+    public static List<ItemStack> CollapseInventory(ItemStack[] Contents, ItemStack[] ArmorContents, HashMap<Integer, ItemStack> LockedIndices)
+    {
+        // This is collapsing and autostacking code.
+        // What happens here is that types are stored in a HashMap of ItemStacks to the amount that there should be.
+        // To account for item damage and the like, a "ref" stack is created with a quantity of 1.
+        // That way, objects with the same material and damage and enchantments should hash the same, disregarding amount.
+        for(ItemStack i : Contents){ if(i != null) Utils.Debug("--" + i.toString()); }
+        Utils.Debug("Collapsing...");   
+        HashMap<ItemStack, Integer> count = new HashMap<>();
+	for(int i = 0; i < Contents.length; i++)
         {
-            ItemStack stack = inventory.getItem(i);
-            if(stack != null && lockedIndices.get(i) == null) collapsed.add(stack);
+            ItemStack stack = Contents[i];
+            if(stack == null || stack.getType() == Material.AIR) continue;
+            if(LockedIndices != null && LockedIndices.get(i) != null) continue;
+            
+            // Since java is too good to distinguish between reference and value i spent like a day debugging this shit
+            // So make sure this is cloned
+            // Lots of java hate in this plugin in particular lol sry
+            ItemStack ref = stack.clone();
+            ref.setAmount(1);
+            
+            int qty = stack.getAmount();
+            Utils.Debug("  " + stack.toString() + " " + stack.hashCode());
+            if(count.get(ref) == null){ Utils.Debug("  Creating..." + qty); count.put(ref, qty); }
+            else
+            {
+                int qtyfin = count.get(ref) + qty;
+                Utils.Debug("  Putting with existing..." + qtyfin); count.put(ref, qtyfin);
+            }
+        }
+        
+        // Take all the stuff in the maps and change them into stacks
+	List<ItemStack> collapsed = new ArrayList<>();
+        Utils.Debug("Compiling...");
+        for(HashMap.Entry<ItemStack, Integer> entry : count.entrySet())
+        {
+            int max = entry.getKey().getType().getMaxStackSize();
+            int total = entry.getValue();
+            int remainder = total % max;
+            int fullstackcount = (total - remainder) / max;
+            Utils.Debug("  " + entry.getKey().getType().toString() + ": " + fullstackcount + "*" + max + "i + " + remainder + " = " + total);
+            
+            for(int i = 1; i <= fullstackcount; i++)
+            {
+                ItemStack full = entry.getKey().clone();
+                full.setAmount(max);
+                collapsed.add(full);
+                Utils.Debug("    ADDING " + full.toString());
+            }
+            
+            if(remainder > 0)
+            {
+                ItemStack partial = entry.getKey().clone();
+                partial.setAmount(remainder);
+                collapsed.add(partial);
+                Utils.Debug("    ADDING " + partial.toString());
+            }
         }
 	
-	if(inventory instanceof PlayerInventory)
+	if(ArmorContents != null)
 	{
-	    PlayerInventory playerinv = (PlayerInventory) inventory;
-	    for(ItemStack stack : playerinv.getArmorContents()){ if(stack != null) collapsed.add(stack); }
+	    for(ItemStack stack : ArmorContents){ if(stack != null && stack.getType() != Material.AIR){  collapsed.add(stack); } }
 	}
+        
+        Utils.Debug("Result...");
+        for(ItemStack i : collapsed){ Utils.Debug("  " + i.toString()); }
 	
+        collapsed.sort(new Comparators.ITEMSTACK_ASCENDING());
 	return collapsed;
+    }
+    public static List<ItemStack> CollapseInventory(Inventory inventory, HashMap<Integer, ItemStack> lockedIndices)
+    {
+        ItemStack[] ArmorContents = null;
+        if(inventory instanceof PlayerInventory) ArmorContents = ((PlayerInventory) inventory).getArmorContents();
+        return CollapseInventory(inventory.getContents(), ArmorContents, lockedIndices);
     }
     
     // TODO: Deambiguify 
@@ -66,38 +127,54 @@ public class Sorting
         I know this source seems messy to read.  Check out the trello card if you're having trouble deciphering this.
         Also watch the various index properties, they can be ambiguous, i need to refactor those...
     */
+    /**
+     * Sort an inventory
+     * @param inventory The inventory to sort
+     * @param pclass The preferences class to apply
+     * @param itemgroups The ItemGroups which the preferences class may reference
+     * @return A SortingResult object containing sorted ItemStack[]s.
+     */
     public static SortingResult SortInventory(Inventory inventory, PreferencesClass pclass, HashMap<String, LinkedList<Material>> itemgroups)
     {
-	// Initial lists, sort and collapse
-	// `collapsed` (initialized later) acts as a queue of items to be sorting.  its entry is set to null whenever the item is assigned a spot.
-	List<PreferencesRule> rules = pclass.getRules();
-	rules.sort(new Comparators.PREFERENCESRULE_DESCENDING());
 	
 	// Indexing for the various pref rules
-        // These indices are all for the INVENTORY arrays, not for `collapsed`
+        // These indices are all for the INVENTORY arrays, not for `queue`
         HashMap<Integer, ItemStack> lockedIndices = new HashMap<>();
 	HashMap<PreferencesRule, List<Integer>> claimedIndices = new HashMap<>();
 	List<Integer> unclaimedIndices = new LinkedList<>();
 	
-	for(PreferencesRule rule : rules){ claimedIndices.put(rule, new LinkedList<Integer>()); }//initialize
+	// Initial lists, sort and collapse
+	// `queue` (initialized later) acts as a queue of items to be sorting.  its entry is set to null whenever the item is assigned a spot.
+	List<PreferencesRule> rules = new LinkedList<>();//fucking java why do i have to initialize this
+        if(pclass != null)
+        {
+            rules= pclass.getRules();
+            rules.sort(new Comparators.PREFERENCESRULE_DESCENDING());
+            for(PreferencesRule rule : rules){ claimedIndices.put(rule, new LinkedList<Integer>()); }//initialize
+        }
+        
+        Utils.Debug("INDEXING:");
 	for(int i = 0; i < inventory.getSize(); i++)
 	{
-	    boolean claimed = false;
-	    InventoryCoords coords = InventoryCoords.FromIndex(i, pclass.getTargetType());
-	    for(PreferencesRule rule : rules)
+            if(pclass != null)
             {
-                if(rule.getTargetArea().Contains(coords))
+                boolean claimed = false;
+                InventoryCoords coords = InventoryCoords.FromIndex(i, pclass.getTargetType());
+                for(PreferencesRule rule : rules)
                 {
-                    if(rule.getType().equalsIgnoreCase("locked")) lockedIndices.put(i, inventory.getItem(i));
-                    else claimedIndices.get(rule).add(i);
-                    claimed = true;
+                    if(rule.getTargetArea().Contains(coords))
+                    {
+                        if(rule.getType().equalsIgnoreCase("locked")) lockedIndices.put(i, inventory.getItem(i));
+                        else claimedIndices.get(rule).add(i);
+                        claimed = true;
+                    }
+                }	    
+                if(!claimed)
+                {
+                    unclaimedIndices.add(i);
                 }
             }
-	    
-	    if(!claimed)
-            {
-                unclaimedIndices.add(i);
-            }
+            else unclaimedIndices.add(i);
 	}
         
         if(Provo.Debug)
@@ -116,24 +193,22 @@ public class Sorting
                 for(Integer i : unclaimedIndices){ vals += (Integer.toString(i) + " "); }
                 Utils.Debug("  " + vals);
         }
-        
-        List<ItemStack> collapsed = CollapseInventory(inventory, lockedIndices);
-	collapsed.sort(new Comparators.ITEMSTACK_ASCENDING());
-	HashMap<CraftedUtility.Item, Integer> strongestset = FindStrongestSet(collapsed);
-	
-	inventory.clear();
+                
         SortingResult ret = new SortingResult();
-	ItemStack[] result = new ItemStack[inventory.getSize()];
-        
-        if(Provo.Debug)
-        {
-            Utils.Debug("Stacks:");
-            for(ItemStack stack : collapsed){ Utils.Debug("  " + stack.toString()); }
-        }
+        Utils.Debug("QUEUEING:");
+        List<ItemStack> queue = CollapseInventory(inventory, lockedIndices);
+        //Utils.Debug("TEST:"); CollapseInventory(inventory, null);
+	HashMap<CraftedUtility.Item, Integer> strongestset = FindStrongestSet(queue);
+        if(strongestset == null) Utils.Debug("HELP");
 	
+	//inventory.clear();
+	ItemStack[] InventoryContents = new ItemStack[inventory.getSize()];
+        ItemStack[] ArmorContents = null;
+	
+        // Armor StrongestSet
 	if(inventory instanceof PlayerInventory)
 	{
-	    PlayerInventory playerinv = (PlayerInventory) inventory;
+            ArmorContents = new ItemStack[4];
 	    int i_helmet    = strongestset.getOrDefault(CraftedUtility.Item.ARMOR_HELMET,	-1);
 	    int i_chestplate= strongestset.getOrDefault(CraftedUtility.Item.ARMOR_CHESTPLATE,	-1);
 	    int i_leggings  = strongestset.getOrDefault(CraftedUtility.Item.ARMOR_LEGGINGS,	-1);
@@ -141,31 +216,30 @@ public class Sorting
 	    
 	    if(i_helmet != -1)
 	    {
-		playerinv.setHelmet(collapsed.get(i_helmet));
-		collapsed.set(i_helmet, null);
+		ArmorContents[3] = queue.get(i_helmet);
+		queue.set(i_helmet, null);
 	    }
 	    if(i_chestplate != -1)
 	    {
-		playerinv.setChestplate(collapsed.get(i_chestplate));
-		collapsed.set(i_chestplate, null);
+		ArmorContents[2] = queue.get(i_chestplate);
+		queue.set(i_chestplate, null);
 	    }
 	    if(i_leggings != -1)
 	    {
-		playerinv.setLeggings(collapsed.get(i_leggings));
-		collapsed.set(i_leggings, null);
+		ArmorContents[1] = queue.get(i_leggings);
+		queue.set(i_leggings, null);
 	    }
 	    if(i_boots != -1)
 	    {
-		playerinv.setBoots(collapsed.get(i_boots));
-		collapsed.set(i_boots, null);
+		ArmorContents[0] = queue.get(i_boots);
+		queue.set(i_boots, null);
 	    }
-            
-            ret.ArmorContents = playerinv.getArmorContents();
 	}
 	
 	// Actual sorting code below.
 	// Take note that a null check is required for each iteration of a loop
-	// as the `collapsed` bit is set to null whenever the item is given a home
+	// as the `queue` bit is set to null whenever the item is given a home
+        Utils.Debug("SORTING:");
         for(PreferencesRule rule : rules)
         {
             Utils.Debug("Rule " + rule.toString());
@@ -179,32 +253,41 @@ public class Sorting
                 
                 if(rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR)
                 {
-                    Utils.Debug("set rule as singular");
+                    Utils.Debug("  Set-rule as singular");
                     
-                    int strongest = strongestset.get(type);
+                    int strongest_i = strongestset.getOrDefault(type, -1);                    
+                    if(strongest_i == -1) continue;
+                    
+                    if(claimedIndices.get(rule).isEmpty()) continue;//no more fillable spaces, CONTINUE cause this isn't an inner loop
                     int newindex = claimedIndices.get(rule).get(0);
                     if(lockedIndices.get(newindex) != null) continue;
-                    result[newindex] = collapsed.get(strongest);
-                    Utils.Debug("  Assigning " + collapsed.get(strongest).toString() + " to index " + newindex);
-                    collapsed.set(strongest, null);
+                    
+                    
+                    ItemStack strongest_stack = queue.get(strongest_i);
+                    if(strongest_stack == null){ Utils.Debug("  Already assigned"); continue; }
+                    
+                    InventoryContents[newindex] = strongest_stack;
+                    queue.set(strongest_i, null);
                     claimedIndices.get(rule).remove(0);//see annotation below about lists
+                    Utils.Debug("  Assigning " + strongest_stack.toString() + " to index " + newindex);
                 }
                 else
                 {
-                    Utils.Debug("set rule as plural");
-                    for(int i = 0; i < collapsed.size(); i++)
+                    Utils.Debug("  Set-rule as plural");
+                    for(int i = 0; i < queue.size(); i++)
                     {
-                        ItemStack stack = collapsed.get(i);
+                        ItemStack stack = queue.get(i);
                         if(stack == null) continue;
                         CraftedUtility utility = CraftedUtility.fromMaterial(stack.getType());
                         if(utility == null) continue;
                         if(utility.getItem() != type) continue;
-
+                        
+                        if(claimedIndices.get(rule).isEmpty()) break;//no more fillable spaces, BREAK cause this is an inner rule
                         int newindex = claimedIndices.get(rule).get(0);
                         if(lockedIndices.get(newindex) != null) continue;
 
-                        result[newindex] = stack;
-                        collapsed.set(i, null);
+                        InventoryContents[newindex] = stack;
+                        queue.set(i, null);
                         claimedIndices.get(rule).remove(0);//see annotation below about lists
                         Utils.Debug("  Assigning " + stack.toString() + " to index " + newindex);
                     }
@@ -214,19 +297,21 @@ public class Sorting
             }
             catch(IllegalArgumentException e)
             {//i know using exceptions as a control statement is a bad idea but java leaves me no choice soz
-                for(int i = 0; i < collapsed.size(); i++)
+                for(int i = 0; i < queue.size(); i++)
                 {                
-                    ItemStack stack = collapsed.get(i);
+                    ItemStack stack = queue.get(i);
                     if(stack == null) continue;
                     if(!rule.MatchesMaterial(stack.getType(), itemgroups)) continue;
 
+                    if(claimedIndices.get(rule).isEmpty()) continue;//no more fillable spaces, BREAK cause this is an inner loop
                     int newindex = claimedIndices.get(rule).get(0);
                     if(lockedIndices.get(newindex) != null) continue;
-                    result[newindex] = stack;
+
+                    InventoryContents[newindex] = stack;
                     claimedIndices.get(rule).remove(0);//holy fucking java lists.  keep in mind this removes index 0 not value 0 hopefully thanks to hacky autoboxing
                     Utils.Debug("  Assigning " + stack.toString() + " to index " + newindex);
 
-                    collapsed.set(i, null);
+                    queue.set(i, null);
                 }
             }
             catch(Exception e)
@@ -235,28 +320,28 @@ public class Sorting
             }
         }
 	// After all matchable items are matched, if there are any stragglers...
-	for(int i = 0; i < collapsed.size(); i++)
+	for(int i = 0; i < queue.size(); i++)
 	{
-	    ItemStack stack = collapsed.get(i);
+	    ItemStack stack = queue.get(i);
 	    if(stack == null) continue;
             Utils.Debug("Looking for a space for " + stack.toString() + "...");
 	    
 	    if(!unclaimedIndices.isEmpty())
 	    {
-		result[unclaimedIndices.get(0)] = stack;
+		InventoryContents[unclaimedIndices.get(0)] = stack;
 		unclaimedIndices.remove(0);
-		collapsed.set(i, null);
+		queue.set(i, null);
 	    }
 	    else
 	    {
-                // Through the INVENTORY, not `collapsed`
-		for(int j = 0; j < result.length; j++)
+                // Through the INVENTORY, not `queue`
+		for(int j = 0; j < InventoryContents.length; j++)
 		{
                     if(lockedIndices.get(j) != null) continue;
-		    if(result[j] != null)
+		    if(InventoryContents[j] != null)
 		    {
-			result[j] = stack;
-			collapsed.set(j, null);
+			InventoryContents[j] = stack;
+			queue.set(j, null);
 			break;//next ItemStack
 		    }
 		}
@@ -266,11 +351,18 @@ public class Sorting
         //re-add locked indices
         for(HashMap.Entry<Integer, ItemStack> entry : lockedIndices.entrySet())
         {
-            result[entry.getKey()] = entry.getValue();
-        }
+            InventoryContents[entry.getKey()] = entry.getValue();
+        }        
 	
 	// Slick, finally done smh
-        ret.Contents = result;
+        ret.Contents = InventoryContents;
+        if(inventory instanceof PlayerInventory) { ret.ArmorContents = ArmorContents; }
         return ret;
+    }
+    
+    public static void ApplyResult(Inventory i, SortingResult res)
+    {
+        i.setContents(res.Contents);
+        if(i instanceof PlayerInventory) ((PlayerInventory) i).setArmorContents(res.ArmorContents);
     }
 }

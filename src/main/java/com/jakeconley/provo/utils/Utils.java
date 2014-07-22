@@ -24,7 +24,8 @@ public class Utils
     public static void Info(String message){ log.info("[Provo] " + message); }
     public static void Warning(String message){ log.warning("[Provo] " + message); }
     public static void Severe(String message){ log.severe("[Provo] " + message); }
-    public static void Debug(String message){ if(Provo.Debug) log.info("[Provo - DEBUG] " + message); }
+    public static void PrlnDebug(String message){ log.info("[Provo - DEBUG] " + message); }
+    public static void Debug(String message){ if(Provo.Debug) PrlnDebug(message); }
     
     public static boolean LocationEquals(Location l1, Location l2)
     {
