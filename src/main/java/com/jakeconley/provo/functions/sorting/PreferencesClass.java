@@ -9,14 +9,14 @@ public class PreferencesClass
     private String Name;
     private final InventoryType TargetType;
     private final List<PreferencesRule> Rules;
-    private String Inheritee;
+    private String Inheritance = null;
     
     public String getName(){ return Name; }
     public InventoryType getTargetType(){ return TargetType; }
     public List<PreferencesRule> getRules(){ return Rules; }
-    public String getInheritee(){ return Inheritee; }
+    public String getInheritance(){ return Inheritance; }
     public void setName(String value){ Name = value; }
-    public void setInheritee(String value){ Inheritee = value; }
+    public void setInheritance(String value){ Inheritance = value; }
     public boolean addRule(PreferencesRule value){ return Rules.add(value); }
     public boolean removeRule(PreferencesRule value){ return Rules.remove(value); }
     

@@ -1,5 +1,6 @@
 package com.jakeconley.provo.functions.sorting;
 
+import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.utils.inventory.InventoryRange;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,6 +38,10 @@ public class PreferencesRule
         LinkedList<Material> group = itemgroups.get(Type);
         if(group != null){ if(group.contains(m)) return true; }
         
+        Material fetched = Utils.GetMaterial(Type);
+        if(fetched == m) return true;
+        
+        if(Type.equals("*")) return true;
         if(Type.equals("any")) return true;
         if(Type.equals("blocks")) return m.isBlock();
         if(Type.equals("items")) return !(m.isBlock());

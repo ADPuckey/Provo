@@ -42,10 +42,7 @@ public class SortingPreferencesBackend
     
     private Material StringToMaterial(String s, String filepath)
     {
-        Material m = Material.matchMaterial(s);
-
-        // MATERIAL FIXES GO HERE
-        if(s.equalsIgnoreCase("carrot")) m = Material.CARROT_ITEM;
+        Material m = Utils.GetMaterial(s);
 
         if(m == null)
         {
@@ -174,15 +171,12 @@ public class SortingPreferencesBackend
                 y.SaveFile();
             }
             else
-            {          
-                int highest = 0;
-                // Calculate highest priority, then subtract that from all rules to make inherited priorities negative
-                for(PreferencesRule rule : rules){ if(rule.getPriority() > highest) highest = rule.getPriority(); }
+            {
                 for(PreferencesRule rule : inheriteeclass.getRules())
                 {
                     // Generate the new rule and add it to the rules
                     PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getType());
-                    rule.setPriority(rule.getPriority() + highest);
+                    rule.setPriority(2);
                     rule.setInherited(true);
                     rule.setInheritedFrom(inheritee);
                     rules.add(rule);
@@ -191,7 +185,7 @@ public class SortingPreferencesBackend
         }
         
         PreferencesClass ret = new PreferencesClass(name, inventorytype, rules);
-        if(inheriteeclass != null) ret.setInheritee(inheritee);
+        if(inheriteeclass != null) ret.setInheritance(inheritee);
         return ret;
     }
     public void WritePreferencesClass(String uuid, PreferencesClass pclass) throws Exception
@@ -201,7 +195,7 @@ public class SortingPreferencesBackend
         
         ConfigurationSection newsection = y.get().createSection(pclass.getName());
         newsection.set("type", pclass.getTargetType().toString());        
-        if(pclass.getInheritee() != null) newsection.set("inherits", pclass.getInheritee());
+        if(pclass.getInheritance() != null) newsection.set("inherits", pclass.getInheritance());
         
         List<Map<String, Object>> yaml_rulelist = new LinkedList<>();
         for(PreferencesRule rule : pclass.getRules()){ yaml_rulelist.add(PreferencesRuleToYaml(rule)); }

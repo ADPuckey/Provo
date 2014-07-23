@@ -7,6 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Provo extends JavaPlugin
 {
+    public static String COMMAND_TRADEMARK = org.bukkit.ChatColor.GREEN + "-- Provo by HAPPYGOPUCKEY --";
+    
     public static boolean Debug = true;
     
     private SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
@@ -20,6 +22,7 @@ public class Provo extends JavaPlugin
     {
         getCommand("sort").setExecutor(_SortingCommands);
         getCommand("sorting").setExecutor(_SortingCommands);
+        getCommand("sortinghelp").setExecutor(_SortingCommands);
         
         Utils.Info("Version " + this.getDescription().getVersion() + " enabled.");
     }

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import java.util.UUID;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.Material;
 
 public class Utils
 {
@@ -37,6 +38,16 @@ public class Utils
         if(l1.getWorld() != l2.getWorld()) return false; //if this fails, use world names
         
         return true;
+    }
+    
+    public static Material GetMaterial(String s)
+    {
+        Material m = Material.matchMaterial(s);
+        
+        // MATERIAL FIXES GO HERE
+        if(s.equalsIgnoreCase("carrot")) m = Material.CARROT_ITEM;
+        
+        return m;
     }
     
     public static void ShowCommand(CommandSender cs, String command, String description){ cs.sendMessage(ChatColor.YELLOW + command + ChatColor.WHITE + ": " + description); }

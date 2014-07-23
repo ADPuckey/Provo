@@ -10,4 +10,7 @@ commands:
     usage:  See /sorting help for more information.
   sort:
     description: Sort an inventory!  See /sorting help for more information
-    usage: /sort [class]
+    usage: /sort (class)
+  sortinghelp:
+    description: Information about the sorting commands!
+    usage: /sorthelp [page]
