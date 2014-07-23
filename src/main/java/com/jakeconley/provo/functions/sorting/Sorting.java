@@ -164,7 +164,7 @@ public class Sorting
                 {
                     if(rule.getTargetArea().Contains(coords))
                     {
-                        if(rule.getType().equalsIgnoreCase("locked")) lockedIndices.put(i, inventory.getItem(i));
+                        if(rule.getItem().equalsIgnoreCase("locked")) lockedIndices.put(i, inventory.getItem(i));
                         else claimedIndices.get(rule).add(i);
                         claimed = true;
                     }
@@ -244,12 +244,12 @@ public class Sorting
         {
             Utils.Debug("Rule " + rule.toString());
             if(claimedIndices.get(rule).isEmpty()) continue;//no more fillable spaces
-            if(rule.getType().equalsIgnoreCase("locked")) continue;//locked rules will be accounted for later
+            if(rule.getItem().equalsIgnoreCase("locked")) continue;//locked rules will be accounted for later
             
             try
             {
                 // Get StrongestSet stuff
-                CraftedUtility.Item type = CraftedUtility.Item.valueOf("TOOL_" + rule.getType().toUpperCase());// Will throw exception if not a set rule
+                CraftedUtility.Item type = CraftedUtility.Item.valueOf("TOOL_" + rule.getItem().toUpperCase());// Will throw exception if not a set rule
                 
                 if(rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR)
                 {

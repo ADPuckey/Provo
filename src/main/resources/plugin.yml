@@ -11,6 +11,6 @@ commands:
   sort:
     description: Sort an inventory!  See /sorting help for more information
     usage: /sort (class)
-  sortinghelp:
+  sortinginfo:
     description: Information about the sorting commands!
-    usage: /sorthelp [page]
+    usage: /sortinginfo [page]

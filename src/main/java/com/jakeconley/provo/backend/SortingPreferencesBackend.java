@@ -128,7 +128,7 @@ public class SortingPreferencesBackend
         ret.put("area_fin", pref.getTargetArea().getEnd().toString());
         ret.put("area_type", pref.getTargetArea().getType().toString());
         if(pref.getPriority() != 1) ret.put("priority", pref.getPriority());
-        ret.put("type", pref.getType());
+        ret.put("type", pref.getItem());
         return ret;
     }
     
@@ -175,7 +175,7 @@ public class SortingPreferencesBackend
                 for(PreferencesRule rule : inheriteeclass.getRules())
                 {
                     // Generate the new rule and add it to the rules
-                    PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getType());
+                    PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getItem());
                     rule.setPriority(2);
                     rule.setInherited(true);
                     rule.setInheritedFrom(inheritee);

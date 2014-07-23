@@ -10,7 +10,7 @@ public class Messages
     public static void ReportError(CommandSender cs, Exception e)
     {
         cs.sendMessage(ChatColor.RED + "There was an internal plugin error, please notify an admin.");
-        Utils.LogException(null, e);
+        if(e != null) Utils.LogException(null, e);
     }
-    public static void Usage(CommandSender cs, String message){ cs.sendMessage(ChatColor.RED + "Usage: " + message); }
+    public static void Usage(CommandSender cs, String message){ cs.sendMessage(ChatColor.YELLOW + "Usage: " + message); }
 }

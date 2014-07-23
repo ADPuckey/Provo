@@ -26,7 +26,7 @@ public class Verify
     {
         if(args.length >= arg_len) return true;
         if(message == null) Messages.Usage(cs, c.getUsage());
-        else cs.sendMessage(ChatColor.RED + "Usage: " + message);
+        else cs.sendMessage(ChatColor.YELLOW + "Usage: " + message);
         return false;
     }
 }
