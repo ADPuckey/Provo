@@ -6,4 +6,3 @@ sorting:
   max-classes: 5
   max-rules-per-class: 10
   max-rules-per-class_include-hotbar: false
-  

@@ -6,12 +6,23 @@ public class CraftedUtility
     {
         TOOL_SWORD, TOOL_SPADE, TOOL_PICKAXE, TOOL_AXE, TOOL_HOE,
         ARMOR_HELMET, ARMOR_CHESTPLATE, ARMOR_LEGGINGS, ARMOR_BOOTS;
+        
+        public static boolean isToolType(String s)
+        {
+            if(s.equalsIgnoreCase("sword")) return true;
+            if(s.equalsIgnoreCase("spade")) return true;
+            if(s.equalsIgnoreCase("pickaxe")) return true;
+            if(s.equalsIgnoreCase("axe")) return true;
+            if(s.equalsIgnoreCase("hoe")) return true;
+            return false;
+        }
     }
     public enum ItemMaterial
     {
         WOOD(0), LEATHER(0), GOLD_ARMOR(1), STONE(1), CHAINMAIL(2), IRON(3), GOLD_TOOLS(4), DIAMOND(5);
         
-        public int Index;
+        private final int Index;
+        public int getIndex(){ return Index; }
         ItemMaterial(int _Index){ this.Index = _Index; }
     }
     

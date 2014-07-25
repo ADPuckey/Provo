@@ -1,3 +1,3 @@
 package com.jakeconley.provo;
 
-public enum FunctionStatus{ IDLE, AWAITS_SORTING }
+public enum FunctionStatus{ IDLE, SORTING_CHEST }

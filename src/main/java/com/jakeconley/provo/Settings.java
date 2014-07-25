@@ -12,9 +12,9 @@ public class Settings
     private File SettingsFile = new File("plugins/Provo/config.yml");
     public YamlConfiguration SettingsYaml = new YamlConfiguration();
     
-    public int Sorting_MaxClasses;
-    public int Sorting_MaxRulesPerClass;
-    public boolean Sorting_MRPC_IncludeHotbar;
+    public int Sorting_MaxClasses = -1;
+    public int Sorting_MaxRulesPerClass = -1;
+    public boolean Sorting_MRPC_IncludeHotbar = false;
     
     // Shamelessly stole this from a bukkit tutorial
     private boolean copy(InputStream in, File file)

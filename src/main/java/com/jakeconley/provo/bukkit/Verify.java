@@ -12,7 +12,7 @@ public class Verify
     // Artifact of times when I had to integrate this with PEX API, now just returns simple native API
     public static boolean Permission(Provo plugin, CommandSender s, String permission, boolean message)
     {
-        Player p = null;
+        Player p;
         if(s instanceof Player) p = (Player) s;
         else return true;
         

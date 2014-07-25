@@ -1,6 +1,9 @@
 package com.jakeconley.provo.functions.sorting;
 
 import com.jakeconley.provo.Provo;
+import com.jakeconley.provo.backend.ProvoFormatException;
+import com.jakeconley.provo.backend.SortingPreferencesBackend;
+import com.jakeconley.provo.bukkit.Messages;
 import com.jakeconley.provo.utils.Comparators;
 import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.utils.inventory.CraftedUtility;
@@ -10,8 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -40,7 +44,7 @@ public class Sorting
 	    parsed.put(i, craft);
 	    
 	    if(ret.get(craft.getItem()) == null){ ret.put(craft.getItem(), i); continue; }// If none there, as default
-	    if(craft.getQuality().Index > parsed.get(ret.get(craft.getItem())).getQuality().Index) ret.put(craft.getItem(), i);
+	    if(craft.getQuality().getIndex() > parsed.get(ret.get(craft.getItem())).getQuality().getIndex()) ret.put(craft.getItem(), i);
 	}
 	return ret;
     }
@@ -160,6 +164,13 @@ public class Sorting
             {
                 boolean claimed = false;
                 InventoryCoords coords = InventoryCoords.FromIndex(i, pclass.getTargetType());
+                if(coords == null)
+                {
+                    // Needed for applying chest rules to a doublechest inventory
+                    unclaimedIndices.add(i);
+                    continue;
+                }
+                
                 for(PreferencesRule rule : rules)
                 {
                     if(rule.getTargetArea().Contains(coords))
@@ -360,9 +371,43 @@ public class Sorting
         return ret;
     }
     
-    public static void ApplyResult(Inventory i, SortingResult res)
+    /**
+     * Do the sort including frontend messages and verification.
+     * @param player The player to send the messages to and get item groups from
+     * @param inventory The inventory to sort
+     * @param pclass The preferencesclass to sort it by
+     * @param backend The backend to use in retrieval of stuff
+     */
+    public static void FrontendExecute(Player player, Inventory inventory, PreferencesClass pclass, SortingPreferencesBackend backend)
     {
-        i.setContents(res.Contents);
-        if(i instanceof PlayerInventory) ((PlayerInventory) i).setArmorContents(res.ArmorContents);
+        try
+        {
+            PlayerInventory playerinv = null;
+            if(inventory instanceof PlayerInventory) playerinv = (PlayerInventory) inventory;
+            
+            ItemStack[] invContents = inventory.getContents();
+            ItemStack[] armorContents = (playerinv != null ? playerinv.getArmorContents() : null);
+            
+            HashMap<String, LinkedList<Material>> igroups = backend.FetchItemGroups(player.getUniqueId().toString());
+            Utils.Debug("PRESORT:"); List<ItemStack> PreSort = Sorting.CollapseInventory(invContents, armorContents, null);
+            SortingResult res = Sorting.SortInventory(inventory, pclass, igroups);
+            Utils.Debug("POSTSORT:"); List<ItemStack> PostSort = Sorting.CollapseInventory(res.Contents, res.ArmorContents, null);
+
+            if(PreSort.equals(PostSort))
+            {
+                Utils.Debug("final contents");
+                for(int i = 0; i < res.Contents.length; i++){ Utils.Debug("  " + i + ": " + (res.Contents[i] != null ? res.Contents[i].toString() : "null")); }
+                inventory.clear();
+                inventory.setContents(res.Contents);
+                if(playerinv != null) playerinv.setArmorContents(res.ArmorContents);
+                player.sendMessage(ChatColor.GREEN + "Successfully sorted inventory.");
+            }
+            else
+            {
+                player.sendMessage(ChatColor.RED + "Sort failed!");
+            }
+        }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(player, e); return; }
+        catch(Exception e){ Messages.ReportError(player, e); return; }
     }
 }

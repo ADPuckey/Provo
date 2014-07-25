@@ -1,19 +1,21 @@
 package com.jakeconley.provo.bukkit;
 
+import com.jakeconley.provo.FunctionStatus;
 import com.jakeconley.provo.Provo;
 import com.jakeconley.provo.backend.ProvoFormatException;
 import com.jakeconley.provo.backend.SortingPreferencesBackend;
 import com.jakeconley.provo.functions.sorting.PreferencesClass;
 import com.jakeconley.provo.functions.sorting.PreferencesRule;
 import com.jakeconley.provo.functions.sorting.Sorting;
-import com.jakeconley.provo.functions.sorting.SortingResult;
 import com.jakeconley.provo.utils.Utils;
+import com.jakeconley.provo.utils.inventory.CraftedUtility;
 import com.jakeconley.provo.utils.inventory.InventoryCoords;
 import com.jakeconley.provo.utils.inventory.InventoryRange;
 import com.jakeconley.provo.utils.inventory.InventoryType;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,11 +23,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class CommandsSorting implements CommandExecutor
 {
-    private final HashMap<String, String> CurrentClasses = new HashMap<>();// UUID to pclass
+    private final HashMap<Player, String> CurrentClasses = new HashMap<>();// Player to pclassname
+    
+    // Verified classes, used for getting classes when sorting chests via FunctionsListener
+    private final Map<Player, PreferencesClass> VerifiedClasses = new HashMap<>();
+    protected PreferencesClass getVerifiedClass(Player p){ return VerifiedClasses.get(p); }
+    protected void resetVerifiedClass(Player p){ VerifiedClasses.remove(p); }
     
     private final Provo plugin;
     private final SortingPreferencesBackend backend;
@@ -36,6 +42,43 @@ public class CommandsSorting implements CommandExecutor
     }
     
     private static void CLASSNOTFOUND(CommandSender sender, String name){ sender.sendMessage(ChatColor.YELLOW + "Couldn't find class \"" + name + "\"!"); }
+    private static void COORDINATE_INVALID(CommandSender sender, String coord){ sender.sendMessage(ChatColor.YELLOW + "Invalid coordinate \"" + coord + "\"!  An example coordinate is A1."); }
+    private static void COORDINATE_OUTOFRANGE(CommandSender sender, String coord, InventoryType t)
+    {
+        sender.sendMessage(ChatColor.YELLOW + "Coordinate \"" + coord + "\" is out of range for type " + t.toString() + ".");
+        if(t == InventoryType.CHEST) sender.sendMessage(ChatColor.YELLOW + "Did you mean to use DOUBLECHEST?");
+    }
+    
+    public boolean Verify_ClassLimit(Player p) throws ProvoFormatException, Exception
+    {
+        if(p.hasPermission("provo.sorting.ignorelimits")) return true;
+        Utils.Debug("Class limit: " + backend.FetchPlayerPreferencesClasses(p.getUniqueId().toString()).size() + "/" + plugin.getSettings().Sorting_MaxClasses);
+        if((backend.FetchPlayerPreferencesClasses(p.getUniqueId().toString()).size() + 1) <= plugin.getSettings().Sorting_MaxClasses) return true;
+        p.sendMessage(ChatColor.YELLOW + "You've reached the limit of [" + plugin.getSettings().Sorting_MaxClasses + "] classes!  Use /sorting del-class to remove one if you wish.");
+        return false;
+    }
+    public boolean Verify_RuleLimit(Player p, String classname) throws ProvoFormatException, Exception
+    {
+        if(p.hasPermission("provo.sorting.ignorelimits")) return true;
+        
+        int count = 0;
+        PreferencesClass pclass = backend.FetchPlayerPreferencesClass(p.getUniqueId().toString(), classname);
+        if(!plugin.getSettings().Sorting_MRPC_IncludeHotbar) count = pclass.getRules().size();
+        else
+        {
+            for(PreferencesRule rule : pclass.getRules())
+            {
+                if(pclass.getTargetType() == InventoryType.PLAYER && rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR && rule.getTargetArea().getStart().getActualIndex() <= 8){ Utils.Debug(rule.toString() + " is a hotbar rule"); continue; }
+                else count++;
+            }
+        }
+        
+        Utils.Debug("Rule limit: " + count + "/" + plugin.getSettings().Sorting_MaxRulesPerClass);
+        if((count + 1) <= plugin.getSettings().Sorting_MaxRulesPerClass) return true;
+        p.sendMessage(ChatColor.YELLOW + "You've reached the limit of [" + plugin.getSettings().Sorting_MaxRulesPerClass + "] rules!  Use /sorting del-rule to remove one if you wish.");
+        if(plugin.getSettings().Sorting_MRPC_IncludeHotbar) p.sendMessage(ChatColor.YELLOW + "Note that on this server, singular rules in the hotbar (e.g. a sword in space D1) don't count towards your limit.");
+        return false;
+    }
     
         
     @Override
@@ -55,14 +98,14 @@ if(label.equalsIgnoreCase("sort"))
     if(player == null){ Messages.Player(sender); return true; }
     if(!Verify.Permission(plugin, sender, "provo.sorting.sort", true)) return true;
 
-    String pclassname = CurrentClasses.get(player_uuid);            
+    String pclassname = CurrentClasses.get(player);            
     if(pclassname == null)
     {
         if(args.length < 1)
         {
             player.sendMessage(ChatColor.YELLOW + "You must use /sort <class name> to pick a class first!");
             player.sendMessage(ChatColor.YELLOW + "" +  ChatColor.ITALIC + "Then" + ChatColor.RESET + ChatColor.YELLOW + " you may use /sort alone.");
-            player.sendMessage(ChatColor.YELLOW + "Use /sortinghelp for more information.");
+            player.sendMessage(ChatColor.YELLOW + "Use /sortinginfo for more information.");
             return true;
         }
     }
@@ -75,44 +118,34 @@ if(label.equalsIgnoreCase("sort"))
         {
             player.sendMessage(ChatColor.YELLOW + "Couldn't find class \"" + pclassname + "\"!");
             if(args.length < 1) player.sendMessage(ChatColor.YELLOW + "Use /sort <classname> to set a new class name.");
+            return true;
         }
         
-        CurrentClasses.put(player_uuid, pclassname);
+        CurrentClasses.put(player, pclassname);
         
-        HashMap<String, LinkedList<Material>> igroups = backend.FetchItemGroups(player_uuid);
-        
-        Utils.Debug("PRESORT:"); List<ItemStack> PreSort = Sorting.CollapseInventory(player.getInventory().getContents(), player.getInventory().getArmorContents(), null);
-        SortingResult res = Sorting.SortInventory(player.getInventory(), pclass, igroups);
-        Utils.Debug("POSTSORT:"); List<ItemStack> PostSort = Sorting.CollapseInventory(res.Contents, res.ArmorContents, null);
-        
-        if(PreSort.equals(PostSort))
-        {
-            Utils.Debug("final contents");
-            for(int i = 0; i < res.Contents.length; i++){ Utils.Debug("  " + i + ": " + (res.Contents[i] != null ? res.Contents[i].toString() : "null")); }
-            player.getInventory().clear();
-            player.getInventory().setArmorContents(res.ArmorContents);
-            player.getInventory().setContents(res.Contents);        
-            player.sendMessage(ChatColor.GREEN + "Successfully sorted inventory.");
-        }
+        if(pclass.getTargetType() == InventoryType.PLAYER) Sorting.FrontendExecute(player, player.getInventory(), pclass, backend);
         else
         {
-            player.sendMessage(ChatColor.RED + "Sort failed!");
+            VerifiedClasses.put(player, pclass);
+            plugin.setPlayerStatus(player, FunctionStatus.SORTING_CHEST);
+            player.sendMessage(ChatColor.YELLOW + "Click on the chest you would like to sort.");
         }
+        
         return true;
     }
-    catch(ProvoFormatException e){ return true; }
+    catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
     catch(Exception e){ Messages.ReportError(sender, e); return true; }
 }
 if(label.equalsIgnoreCase("sortinginfo"))
 {
     int page = 1;
-    final int PAGE_MAX = 2;
+    final int PAGE_MAX = 3;
     if(args.length > 0)
     {
         try
         {
             int parsed = Integer.parseInt(args[0]);
-            if(0 < parsed && parsed < PAGE_MAX) page = parsed;
+            if(0 < parsed && parsed <= PAGE_MAX) page = parsed;
         }
         catch(NumberFormatException e)
         {
@@ -127,11 +160,30 @@ if(label.equalsIgnoreCase("sortinginfo"))
     switch(page)
     {
         case 1:
-            sender.sendMessage("Sorting is a powerful feature in provo that can organize your inventory or chests in one simple command.");
-            sender.sendMessage("Sorting is done via the /sort command.  In order to sort, one needs to first understand classes.");
+            sender.sendMessage(ChatColor.AQUA + "This guide is meant for people who are familiar with sorting mods such as InventoryTweaks.");
+            sender.sendMessage(ChatColor.AQUA + "If you read this and need more information, please visit <NOT IMPLMENETED>.");
+            sender.sendMessage("In order to sort, one needs to make a class.");
             sender.sendMessage("A class is a set of rules that tells the plugin exactly how you want your inventory sorted.");
-            sender.sendMessage("By default, you are given a class named \"base\".");
+            sender.sendMessage("By default, you are given a class named \"base\".  Classes can inherit other classes.");
+            sender.sendMessage("When you create a class you can choose it to be a PLAYER, CHEST or DOUBLECHEST class.");
+            sender.sendMessage("Rules consist of an area specified by coordinates, and a type.  Coordinates are made by placing a letter (row A is the first row, B the second...) and a column number.");
+            sender.sendMessage("You can have linear (wrapping around) rules or rectangular rules.  An example is \"A1-B5 LINEAR\", or for one space \"A1\".");
             sender.sendMessage(ChatColor.YELLOW + "To learn more, type " + ChatColor.BOLD + "/sortinginfo 2" + ChatColor.RESET + ChatColor.YELLOW + ".");
+            return true;
+        case 2:
+            sender.sendMessage("Rules also require an item or group to match, you can set this to one item like \"glowstone\" or one of a few " + ChatColor.ITALIC + "groups" + ChatColor.RESET + ".");
+            sender.sendMessage("There are a few built in groups, these are blocks, items, edible, flammable, burnable.  They match bukkit's definitions of their descriptions.");
+            sender.sendMessage("Other groups can be set by your server administration, use /sorting list-groups to see them.");
+            sender.sendMessage("Setting a single space rule's group to \"sword\" or any tool type means it'll match the strongest of that tool.");
+            sender.sendMessage("The sorting engine will attempt to fill all unassigned spaces before overwriting spaces \"belonging\" to other rules.");
+            sender.sendMessage("The rule group \"*\" or \"any\", as implied, match any item type.");
+            sender.sendMessage(ChatColor.YELLOW + "To learn about priorities, type " + ChatColor.BOLD + "/sortinginfo 3" + ChatColor.RESET + ChatColor.YELLOW + ".");
+            return true;
+        case 3:
+            sender.sendMessage("Rules can be assigned priorities, a greater priority means that rule will be assessed first by the sorting engine.");
+            sender.sendMessage("Inherited classes' rules have a priority of 1 + their original priority by default, otherwise rules are given a default priority of 1.");
+            sender.sendMessage("To assign a priority to a rule, see /sorting help add-rule.");
+            sender.sendMessage(ChatColor.YELLOW + "That's it!  Go out and do some sorting!");
             return true;
     }
 }
@@ -215,7 +267,7 @@ if(player == null){ Messages.Player(sender); return true; }
                 player.sendMessage(msg);
             }
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         
         return true;
@@ -256,7 +308,7 @@ if(player == null){ Messages.Player(sender); return true; }
             
             return true;
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
     }
     
@@ -275,7 +327,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Item groups:");
             for(String s : groups.keySet()){ sender.sendMessage(ChatColor.DARK_GREEN + s); }
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }
@@ -297,7 +349,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Group " + args[1]);
             for(Material m : group){ sender.sendMessage(ChatColor.DARK_GREEN + "- " + m.toString()); }
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }
@@ -309,10 +361,12 @@ if(player == null){ Messages.Player(sender); return true; }
         if(player == null){ Messages.Player(sender); return true; }
         if(!Verify.ArgsLength(cmd, sender, args, 3, USAGE)){ return true; }        
         if(!Verify.Permission(plugin, sender, "provo.sorting.createclass", true)) return true;
-        //TODO: Limits
+        // Class limit verification down there vv
         
         try
         {
+            if(!Verify_ClassLimit(player)) return true;
+
             PreferencesClass class_check = backend.FetchPlayerPreferencesClass(player_uuid, args[1]);
             if(class_check != null)
             {
@@ -354,7 +408,7 @@ if(player == null){ Messages.Player(sender); return true; }
             backend.WritePreferencesClass(player_uuid, res);
             sender.sendMessage(ChatColor.GREEN + "Successfully created class \"" + name + "\".");
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }
@@ -377,7 +431,7 @@ if(player == null){ Messages.Player(sender); return true; }
             backend.DeletePreferencesClass(player_uuid, args[1]);
             sender.sendMessage(ChatColor.GREEN + "Successfully deleted class \"" + args[1] + "\".");
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }
@@ -388,8 +442,9 @@ if(player == null){ Messages.Player(sender); return true; }
         if(player == null){ Messages.Player(sender); return true; }
         if(!Verify.ArgsLength(cmd, sender, args, 4, USAGE)){ return true; }        
         if(!Verify.Permission(plugin, sender, "provo.sorting.editclass", true)) return true;
+        // Rule limit verification below class validation vv
         try
-        {
+        {            
             String pclass_str = args[1];
             int priority = 1;
             if(args[1].contains(":"))
@@ -403,11 +458,13 @@ if(player == null){ Messages.Player(sender); return true; }
             }
             
             PreferencesClass pclass = backend.FetchPlayerPreferencesClass(player_uuid, pclass_str);
-            if(pclass == null){ CLASSNOTFOUND(sender, pclass_str); return true; }
+            if(pclass == null){ CLASSNOTFOUND(sender, pclass_str); return true; }            
+            
+            if(!Verify_RuleLimit(player, pclass.getName())) return true;
             
             //item/group verification
             String item = args[2];
-            if(!backend.ItemGroupExists(player_uuid, item) && Utils.GetMaterial(item) == null)
+            if(!backend.ItemGroupExists(player_uuid, item) && Utils.GetMaterial(item) == null && !CraftedUtility.Item.isToolType(item))
             {
                 sender.sendMessage(ChatColor.YELLOW + "Unknown item or group \"" + item + "\".");
                 return true;
@@ -467,15 +524,25 @@ if(player == null){ Messages.Player(sender); return true; }
             
             start = InventoryCoords.FromString(start_str, pclass.getTargetType());
             end = InventoryCoords.FromString(end_str, pclass.getTargetType());            
-            if(start == null){ sender.sendMessage(ChatColor.YELLOW + "Invalid coordinate \"" + start_str + "\"!  An example coordinate is A1."); return true; }
-            if(end == null){ sender.sendMessage(ChatColor.YELLOW + "Invalid coordinate \"" + end_str + "\"!  An example coordinate is A1."); return true; }
+            if(start == null)
+            {
+                if(InventoryCoords.FromString(start_str, InventoryType.MAX) != null) COORDINATE_OUTOFRANGE(sender, start_str, pclass.getTargetType());
+                else COORDINATE_INVALID(sender, start_str);
+                return true;
+            }
+            if(end == null)
+            {
+                if(InventoryCoords.FromString(end_str, InventoryType.MAX) != null) COORDINATE_OUTOFRANGE(sender, end_str, pclass.getTargetType());
+                else COORDINATE_INVALID(sender, end_str);
+                return true;
+            }
             
             InventoryRange area = new InventoryRange(start, end, rangetype);
             PreferencesRule rule = new PreferencesRule(priority, area, item);
             backend.WritePreferencesRule(player_uuid, pclass_str, rule);
             sender.sendMessage(ChatColor.GREEN + "Successfully added rule " + ChatColor.AQUA + rule.toString() + ChatColor.GREEN + " to class \"" + pclass_str + "\".");
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }
@@ -525,7 +592,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Successfully deleted rule " + ChatColor.AQUA + "#" + args[2] + ChatColor.GREEN + " from class \"" + args[1] + "\".");
             sender.sendMessage(ChatColor.GREEN + "Note that now other rule's indices may have changed.  Use /sorting view-class if you plan on deleting more rules.");
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
+        catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
         catch(Exception e){ Messages.ReportError(sender, e); return true; }
         return true;
     }

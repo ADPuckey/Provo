@@ -28,15 +28,27 @@ public class Provo extends JavaPlugin implements Listener
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerLoginEvent event){ PlayerStatuses.put(event.getPlayer(), FunctionStatus.IDLE); }
     
-    private CommandsGeneral _GeneralCommands = new CommandsGeneral(this);
-    private CommandsSorting _SortingCommands = new CommandsSorting(this);
+    private Settings Settings;
+    public Settings getSettings(){ return Settings; }
+    
+    private CommandsGeneral GeneralCommands = new CommandsGeneral(this);
+    private CommandsSorting SortingCommands = new CommandsSorting(this);
+    public CommandsSorting getSortingCommands(){ return SortingCommands; }
     
     @Override
     public void onEnable()
     {
-        getCommand("sort").setExecutor(_SortingCommands);
-        getCommand("sorting").setExecutor(_SortingCommands);
-        getCommand("sortinginfo").setExecutor(_SortingCommands);
+        Settings = new Settings();
+        Settings.LoadFile(true);
+        
+        getCommand("sort").setExecutor(SortingCommands);
+        getCommand("sorting").setExecutor(SortingCommands);
+        getCommand("sortinginfo").setExecutor(SortingCommands);
+        
+        for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }
+        
+        getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new FunctionsListener(this), this);
         
         Utils.Info("Version " + this.getDescription().getVersion() + " enabled.");
     }

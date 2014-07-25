@@ -53,7 +53,15 @@ public class SortingPreferencesBackend
     }
     
     private LinkedList<Material> GetItemGroup(YamlFile pub, YamlFile priv, String name) throws Exception
+    { return GetItemGroup(pub, priv, name, null); }
+    private LinkedList<Material> GetItemGroup(YamlFile pub, YamlFile priv, String name, LinkedList<String> ya_inherited) throws Exception
     {
+        if(ya_inherited == null)
+        {
+            ya_inherited = new LinkedList<>();
+            ya_inherited.add(name);
+        }
+        
         LinkedList<Material> ret = new LinkedList();
         
         // The below needs srs migration later
@@ -66,12 +74,22 @@ public class SortingPreferencesBackend
         }}
         
         List<String> inheritance = section.getStringList("inherits");// to be inherited
-        LinkedList<String> ya_inherited = new LinkedList<>();// to prevent linking twice
         
         // Resolve inheritance
         for(String s : inheritance)
         {
-            for(Material m : GetItemGroup(pub, priv, s)){ ret.add(m); }
+            if(ya_inherited.contains(s))
+            {                
+                ProvoFormatException e = new ProvoFormatException(null);
+                e.setFilePath(pub.getFile().getPath());
+                e.setType(ProvoFormatException.Type.MUTUAL_INHERITANCE);
+                e.setOrigin(ProvoFormatException.Origin.PUBLIC);
+                e.setFixed(false);
+                throw e;
+            }
+            ya_inherited.add(s);
+            
+            for(Material m : GetItemGroup(pub, priv, s, ya_inherited)){ ret.add(m); }
         }
         
         return ret;
@@ -135,9 +153,19 @@ public class SortingPreferencesBackend
     public Set<String> FetchPlayerPreferencesClasses(String uuid) throws Exception
     {
         return LoadPlayerClassesYaml(uuid).get().getKeys(false);
-    }    
+    }
+    
+    // Ok had to separate these two to prevent mutal inheritance bugs
     public PreferencesClass FetchPlayerPreferencesClass(String uuid, String name) throws ProvoFormatException, Exception
+    { return FetchPlayerPreferencesClass(uuid, name, null); }
+    private PreferencesClass FetchPlayerPreferencesClass(String uuid, String name, LinkedList<String> ya_inherited) throws ProvoFormatException, Exception
     {
+        if(ya_inherited == null)
+        {
+            ya_inherited = new LinkedList<>();
+            ya_inherited.add(name);
+        }
+        
         YamlFile y = LoadPlayerClassesYaml(uuid);        
         if(y.get().getConfigurationSection(name) == null) return null;
                 
@@ -162,7 +190,21 @@ public class SortingPreferencesBackend
         PreferencesClass inheriteeclass = null;
         if(inheritee != null)
         {
-            inheriteeclass = FetchPlayerPreferencesClass(uuid, inheritee);
+            if(ya_inherited.contains(inheritee))
+            {
+                // Mutual inheritance
+                y.get().set(name + ".inherits", null);
+                y.SaveFile();
+
+                ProvoFormatException e = new ProvoFormatException(null);
+                e.setFilePath(y.getFile().getPath());
+                e.setType(ProvoFormatException.Type.MUTUAL_INHERITANCE);
+                e.setFixed(true);
+                throw e;
+            }
+            ya_inherited.add(inheritee);
+            inheriteeclass = FetchPlayerPreferencesClass(uuid, inheritee, ya_inherited);
+            
             if(inheriteeclass == null)
             {
                 Utils.Warning("Couldn't find inherited class " + inheritee + " in file " + y.getFile().getPath());
@@ -176,7 +218,7 @@ public class SortingPreferencesBackend
                 {
                     // Generate the new rule and add it to the rules
                     PreferencesRule newrule = new PreferencesRule(rule.getPriority(), rule.getTargetArea(), rule.getItem());
-                    rule.setPriority(2);
+                    rule.setPriority(rule.getPriority() + 1);
                     rule.setInherited(true);
                     rule.setInheritedFrom(inheritee);
                     rules.add(rule);
