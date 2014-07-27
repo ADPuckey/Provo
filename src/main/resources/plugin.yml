@@ -14,3 +14,6 @@ commands:
   sortinginfo:
     description: Information about the sorting commands!
     usage: /sortinginfo [page]
+  view-notifications:
+    description: View your remaining notifications.
+    usage: Use /view-notifications.

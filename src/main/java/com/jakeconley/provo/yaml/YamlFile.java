@@ -67,6 +67,7 @@ public class YamlFile
         if(!File.exists())
         {
             Utils.Warning("YAML " + File.getName() + " does not exist, attempting to create default...");
+            File.getParentFile().mkdirs();
             CopyTo(this.getClass().getResourceAsStream(defpath), File);
             Utils.Info("Creation successful.");
         }
@@ -75,7 +76,14 @@ public class YamlFile
     }
     public void LoadDefaultNew() throws Exception
     {
-        try{ if(!File.exists()) File.createNewFile(); }
+        try
+        {
+            if(!File.exists())
+            {
+                File.getParentFile().mkdirs();
+                File.createNewFile();
+            }
+        }
         catch(Exception e)
         {
             Utils.Severe("Could not create new file: " + e.toString());

@@ -16,10 +16,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 
-public class FunctionsListener implements Listener
+public class ListenerFunctions implements Listener
 {
     private final Provo plugin;
-    public FunctionsListener(Provo _plugin){ plugin = _plugin; }
+    public ListenerFunctions(Provo _plugin){ plugin = _plugin; }
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void OnPlayerInteract(PlayerInteractEvent e)

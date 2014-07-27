@@ -3,7 +3,7 @@ package com.jakeconley.provo.backend;
 public class ProvoFormatException extends Exception
 {
     public static enum Origin{ PUBLIC, PRIVATE }
-    public static enum Type{ UNSPECIFIED, MUTUAL_INHERITANCE }
+    public static enum Type{ UNSPECIFIED, MUTUAL_INHERITANCE, NOTIFICATION_FORMAT }
     
     private final String Message;
     private String Path = null;

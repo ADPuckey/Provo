@@ -97,6 +97,8 @@ if(label.equalsIgnoreCase("sort"))
 {
     if(player == null){ Messages.Player(sender); return true; }
     if(!Verify.Permission(plugin, sender, "provo.sorting.sort", true)) return true;
+    
+    plugin.setPlayerStatus(player, FunctionStatus.IDLE);// To cancel a previously pending sort if exists
 
     String pclassname = CurrentClasses.get(player);            
     if(pclassname == null)
@@ -134,7 +136,7 @@ if(label.equalsIgnoreCase("sort"))
         return true;
     }
     catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-    catch(Exception e){ Messages.ReportError(sender, e); return true; }
+    catch(Exception e){ Messages.ReportException(sender, e); return true; }
 }
 if(label.equalsIgnoreCase("sortinginfo"))
 {
@@ -230,8 +232,8 @@ if(player == null){ Messages.Player(sender); return true; }
         try
         {
         }
-        catch(ProvoFormatException e){ Messages.ReportError(sender, null); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(ProvoFormatException e){ Messages.ReportException(sender, null); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     */
     if(args[0].equalsIgnoreCase("list-classes"))
@@ -252,7 +254,7 @@ if(player == null){ Messages.Player(sender); return true; }
             }
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         
         return true;
     }
@@ -293,7 +295,7 @@ if(player == null){ Messages.Player(sender); return true; }
             return true;
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
     }
     
     if(args[0].equalsIgnoreCase("list-groups"))
@@ -312,7 +314,7 @@ if(player == null){ Messages.Player(sender); return true; }
             for(String s : groups.keySet()){ sender.sendMessage(ChatColor.DARK_GREEN + s); }
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
     if(args[0].equalsIgnoreCase("view-group"))
@@ -334,7 +336,7 @@ if(player == null){ Messages.Player(sender); return true; }
             for(Material m : group){ sender.sendMessage(ChatColor.DARK_GREEN + "- " + m.toString()); }
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
     
@@ -393,7 +395,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Successfully created class \"" + name + "\".");
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
     if(args[0].equalsIgnoreCase("del-class"))
@@ -416,7 +418,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Successfully deleted class \"" + args[1] + "\".");
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
     
@@ -527,7 +529,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Successfully added rule " + ChatColor.AQUA + rule.toString() + ChatColor.GREEN + " to class \"" + pclass_str + "\".");
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
     if(args[0].equalsIgnoreCase("del-rule"))
@@ -577,7 +579,7 @@ if(player == null){ Messages.Player(sender); return true; }
             sender.sendMessage(ChatColor.GREEN + "Note that now other rule's indices may have changed.  Use /sorting view-class if you plan on deleting more rules.");
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(sender, e); return true; }
-        catch(Exception e){ Messages.ReportError(sender, e); return true; }
+        catch(Exception e){ Messages.ReportException(sender, e); return true; }
         return true;
     }
 

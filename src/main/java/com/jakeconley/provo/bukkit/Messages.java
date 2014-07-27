@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 public class Messages
 {
     public static void Player(CommandSender s){ s.sendMessage("You can only do that from in-game."); }
-    public static void ReportError(CommandSender cs, Exception e)
+    public static void ReportException(CommandSender cs, Exception e)
     {
         cs.sendMessage(ChatColor.RED + "There was an internal plugin error, please notify an admin.");
         if(e != null) Utils.LogException(null, e);
@@ -21,7 +21,10 @@ public class Messages
                 sender.sendMessage(ChatColor.RED + "A mutual inheritance error occured.");
                 if(e.getOrigin() == ProvoFormatException.Origin.PUBLIC) sender.sendMessage(ChatColor.YELLOW + "This is due to an invalid server configuration.");
                 else sender.sendMessage(ChatColor.YELLOW + "This means you somehow created two classes that inherit each other, creating an infinite loop.");
-                break;                
+                break;
+            case NOTIFICATION_FORMAT:
+                sender.sendMessage(ChatColor.RED + "Error while retrieving your notifications.");
+                break;
             default:
                 sender.sendMessage(ChatColor.RED + "An unknown error occured.");
                 Utils.Severe("Unspecified ProvoFormatException " + e.toString());

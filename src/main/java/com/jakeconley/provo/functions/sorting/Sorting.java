@@ -452,6 +452,6 @@ public class Sorting
             }
         }
         catch(ProvoFormatException e){ Messages.ReportProvoFormatException(player, e); return; }
-        catch(Exception e){ Messages.ReportError(player, e); return; }
+        catch(Exception e){ Messages.ReportException(player, e); return; }
     }
 }
