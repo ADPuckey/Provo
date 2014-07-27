@@ -1,4 +1,5 @@
-# Reserved: blocks, items, edible, flammable, burnable
+# Default: *, any, blocks, items, edible, flammable, burnable
+# These can be overridden, but are hard-coded into the plugin.
 food_meat:
   items:
     - cooked beef
@@ -17,3 +18,8 @@ food:
   inherits:
     - food_meat
     - food_other
+flowers:
+  items:
+    - yellow_flower
+    - red_flower
+    - double_plant

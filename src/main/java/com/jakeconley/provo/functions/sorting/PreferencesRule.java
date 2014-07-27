@@ -41,13 +41,13 @@ public class PreferencesRule
         Material fetched = Utils.GetMaterial(Item);
         if(fetched == m) return true;
         
-        if(Item.equals("*")) return true;
-        if(Item.equals("any")) return true;
-        if(Item.equals("blocks")) return m.isBlock();
-        if(Item.equals("items")) return !(m.isBlock());
-        if(Item.equals("edible")) return m.isEdible();
-        if(Item.equals("flammable")) return m.isFlammable();
-        if(Item.equals("burnable")) return m.isBurnable();
+        if(Item.equalsIgnoreCase("*")) return true;
+        if(Item.equalsIgnoreCase("any")) return true;
+        if(Item.equalsIgnoreCase("blocks")) return m.isBlock();
+        if(Item.equalsIgnoreCase("items")) return !(m.isBlock());
+        if(Item.equalsIgnoreCase("edible")) return m.isEdible();
+        if(Item.equalsIgnoreCase("flammable")) return m.isFlammable();
+        if(Item.equalsIgnoreCase("burnable")) return m.isBurnable();
         
         return false;
     }

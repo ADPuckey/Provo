@@ -63,12 +63,12 @@ public class CommandsSorting implements CommandExecutor
         
         int count = 0;
         PreferencesClass pclass = backend.FetchPlayerPreferencesClass(p.getUniqueId().toString(), classname);
-        if(!plugin.getSettings().Sorting_MRPC_IncludeHotbar) count = pclass.getRules().size();
+        if(plugin.getSettings().Sorting_MRPC_IncludeHotbar) count = pclass.getRules().size();
         else
         {
             for(PreferencesRule rule : pclass.getRules())
             {
-                if(pclass.getTargetType() == InventoryType.PLAYER && rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR && rule.getTargetArea().getStart().getActualIndex() <= 8){ Utils.Debug(rule.toString() + " is a hotbar rule"); continue; }
+                if(!rule.isInherited() && pclass.getTargetType() == InventoryType.PLAYER && rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR && rule.getTargetArea().getStart().getActualIndex() <= 8){ Utils.Debug(rule.toString() + " is a hotbar rule"); continue; }
                 else count++;
             }
         }
@@ -139,7 +139,7 @@ if(label.equalsIgnoreCase("sort"))
 if(label.equalsIgnoreCase("sortinginfo"))
 {
     int page = 1;
-    final int PAGE_MAX = 3;
+    final int PAGE_MAX = 1;
     if(args.length > 0)
     {
         try
@@ -160,31 +160,15 @@ if(label.equalsIgnoreCase("sortinginfo"))
     switch(page)
     {
         case 1:
-            sender.sendMessage(ChatColor.AQUA + "This guide is meant for people who are familiar with sorting mods such as InventoryTweaks.");
-            sender.sendMessage(ChatColor.AQUA + "If you read this and need more information, please visit <NOT IMPLMENETED>.");
-            sender.sendMessage("In order to sort, one needs to make a class.");
+            sender.sendMessage(ChatColor.AQUA + "This guide is meant as a quick start.");
+            sender.sendMessage(ChatColor.AQUA + "For more information and tutorials, please visit <NOT IMPLMENETED>.");
+            sender.sendMessage("In order to sort, one needs a class.  By default, you are given a class named \"base\".");
             sender.sendMessage("A class is a set of rules that tells the plugin exactly how you want your inventory sorted.");
-            sender.sendMessage("By default, you are given a class named \"base\".  Classes can inherit other classes.");
-            sender.sendMessage("When you create a class you can choose it to be a PLAYER, CHEST or DOUBLECHEST class.");
-            sender.sendMessage("Rules consist of an area specified by coordinates, and a type.  Coordinates are made by placing a letter (row A is the first row, B the second...) and a column number.");
-            sender.sendMessage("You can have linear (wrapping around) rules or rectangular rules.  An example is \"A1-B5 LINEAR\", or for one space \"A1\".");
-            sender.sendMessage(ChatColor.YELLOW + "To learn more, type " + ChatColor.BOLD + "/sortinginfo 2" + ChatColor.RESET + ChatColor.YELLOW + ".");
-            return true;
-        case 2:
-            sender.sendMessage("Rules also require an item or group to match, you can set this to one item like \"glowstone\" or one of a few " + ChatColor.ITALIC + "groups" + ChatColor.RESET + ".");
-            sender.sendMessage("There are a few built in groups, these are blocks, items, edible, flammable, burnable.  They match bukkit's definitions of their descriptions.");
-            sender.sendMessage("Other groups can be set by your server administration, use /sorting list-groups to see them.");
-            sender.sendMessage("Setting a single space rule's group to \"sword\" or any tool type means it'll match the strongest of that tool.");
-            sender.sendMessage("The sorting engine will attempt to fill all unassigned spaces before overwriting spaces \"belonging\" to other rules.");
-            sender.sendMessage("The rule group \"*\" or \"any\", as implied, match any item type.");
-            sender.sendMessage(ChatColor.YELLOW + "To learn about priorities, type " + ChatColor.BOLD + "/sortinginfo 3" + ChatColor.RESET + ChatColor.YELLOW + ".");
-            return true;
-        case 3:
-            sender.sendMessage("Rules can be assigned priorities, a greater priority means that rule will be assessed first by the sorting engine.");
-            sender.sendMessage("Inherited classes' rules have a priority of 1 + their original priority by default, otherwise rules are given a default priority of 1.");
-            sender.sendMessage("To assign a priority to a rule, see /sorting help add-rule.");
-            sender.sendMessage(ChatColor.YELLOW + "That's it!  Go out and do some sorting!");
-            return true;
+            sender.sendMessage("To sort your inventory, just type \"/sort base\"!  If you wish to sort again, you can just type \"/sort\".");
+            sender.sendMessage("To sort a chest you must first make a chest class.  Type \"/sorting add-class myclass CHEST\".");
+            sender.sendMessage("You can replace \"myclass\" with whatever you wish.  To sort, you would type \"/sort myclass\".");
+            sender.sendMessage(ChatColor.YELLOW + "To configure your classes, you must learn how to create rules.  Go to the web page above for more.");
+            sender.sendMessage(ChatColor.YELLOW + "Happy sorting!");
     }
 }
 if(label.equalsIgnoreCase("sorting"))
@@ -237,7 +221,7 @@ if(label.equalsIgnoreCase("sorting"))
             sender.sendMessage(ChatColor.DARK_GREEN + "/sorting add-class: " + ChatColor.YELLOW + "Create a class.  Use /sorting help add-class for more.");
             sender.sendMessage(ChatColor.DARK_GREEN + "/sorting del-class <name>: " + ChatColor.YELLOW + "Delete a class.");
             sender.sendMessage(ChatColor.DARK_GREEN + "/sorting add-rule: " + ChatColor.YELLOW + "Add a rule to a class.  Use /sorting help add-rule for more.");
-            sender.sendMessage(ChatColor.DARK_GREEN + "/sorting del-rule <class> <rule number>: " + ChatColor.YELLOW + "Delete a rule numbered <index>.");
+            sender.sendMessage(ChatColor.DARK_GREEN + "/sorting del-rule <class> <rule number>: " + ChatColor.YELLOW + "Delete a rule.");
         }
         return true;
     }
@@ -464,7 +448,7 @@ if(player == null){ Messages.Player(sender); return true; }
             
             //item/group verification
             String item = args[2];
-            if(!backend.ItemGroupExists(player_uuid, item) && Utils.GetMaterial(item) == null && !CraftedUtility.Item.isToolType(item))
+            if(!backend.ItemGroupExists(player_uuid, item) && Utils.GetMaterial(item) == null && CraftedUtility.Item.getToolType(item) == null)
             {
                 sender.sendMessage(ChatColor.YELLOW + "Unknown item or group \"" + item + "\".");
                 return true;

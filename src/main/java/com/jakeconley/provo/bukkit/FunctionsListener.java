@@ -40,7 +40,7 @@ public class FunctionsListener implements Listener
                 
                 if(inventory instanceof DoubleChestInventory && pclass.getTargetType() != InventoryType.DOUBLECHEST)
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Notice:" + ChatColor.RESET + ChatColor.YELLOW + " You're applying a " + pclass.getTargetType().toString() + " class to a double chest; only the first 3 rows can follow the class's rules.");
-                else if(pclass.getTargetType() != InventoryType.CHEST)
+                else if(!(inventory instanceof DoubleChestInventory) && pclass.getTargetType() != InventoryType.CHEST)
                 {
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "You can't apply a " + pclass.getTargetType().toString() + " rule to a single chest!");
                     plugin.getSortingCommands().resetVerifiedClass(e.getPlayer());

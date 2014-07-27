@@ -117,6 +117,15 @@ public class SortingPreferencesBackend
      */
     public boolean ItemGroupExists(String uuid, String group) throws Exception
     {
+        if(group.equalsIgnoreCase("*")) return true;
+        if(group.equalsIgnoreCase("any")) return true;
+        if(group.equalsIgnoreCase("blocks")) return true;
+        if(group.equalsIgnoreCase("items")) return true;
+        if(group.equalsIgnoreCase("edible")) return true;
+        if(group.equalsIgnoreCase("flammable")) return true;
+        if(group.equalsIgnoreCase("burnable")) return true;
+        if(group.equalsIgnoreCase("locked")) return true;
+        
         YamlFile file = LoadPublicItemGroupsYaml();
         return (file.get().getConfigurationSection(group) != null);
     }

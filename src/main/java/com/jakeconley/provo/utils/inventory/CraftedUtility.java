@@ -7,14 +7,14 @@ public class CraftedUtility
         TOOL_SWORD, TOOL_SPADE, TOOL_PICKAXE, TOOL_AXE, TOOL_HOE,
         ARMOR_HELMET, ARMOR_CHESTPLATE, ARMOR_LEGGINGS, ARMOR_BOOTS;
         
-        public static boolean isToolType(String s)
+        public static Item getToolType(String s)
         {
-            if(s.equalsIgnoreCase("sword")) return true;
-            if(s.equalsIgnoreCase("spade")) return true;
-            if(s.equalsIgnoreCase("pickaxe")) return true;
-            if(s.equalsIgnoreCase("axe")) return true;
-            if(s.equalsIgnoreCase("hoe")) return true;
-            return false;
+            if(s.equalsIgnoreCase("sword")) return TOOL_SWORD;
+            if(s.equalsIgnoreCase("spade") || s.equalsIgnoreCase("shovel")) return TOOL_SPADE;
+            if(s.equalsIgnoreCase("pickaxe")) return TOOL_PICKAXE;
+            if(s.equalsIgnoreCase("axe")) return TOOL_AXE;
+            if(s.equalsIgnoreCase("hoe")) return TOOL_HOE;
+            return null;
         }
     }
     public enum ItemMaterial
