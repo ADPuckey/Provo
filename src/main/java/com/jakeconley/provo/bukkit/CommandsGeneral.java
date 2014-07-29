@@ -39,8 +39,11 @@ if(label.equalsIgnoreCase("view-notifications"))
         
         if(notifications.size() > 0)
         {
-            player.sendMessage(ChatColor.AQUA + "You have " + notifications.size() + " notifications:");
-            for(Notification n : notifications){ player.sendMessage(n.toPlayerFriendlyString()); }
+            player.sendMessage(ChatColor.AQUA + "You have " + notifications.size() + " notification(s):");
+            for(Notification n : notifications)
+            {
+                for(String line : n.toPlayerFriendlyStringList()) player.sendMessage(line);
+            }
             
             plugin.getNotificationsBackend().ClearNotifications(player_uuid);
         }

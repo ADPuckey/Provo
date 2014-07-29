@@ -70,7 +70,7 @@ public class Provo extends JavaPlugin implements Listener
     {
         if(p.isOnline())
         {
-            p.sendMessage(n.getText());
+            for(String line : n.getText()) p.sendMessage(line);
             return;
         }
         

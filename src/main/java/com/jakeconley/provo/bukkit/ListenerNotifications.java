@@ -31,10 +31,10 @@ public class ListenerNotifications implements Listener
             for(Notification n : Notifications)
             {
                 Utils.Debug(n.toString());
-                if(n.getImportance() == Notification.Importance.DISPLAY_ON_JOIN)
+                if(n.getImportance() == Notification.Importance.DISPLAY_ON_JOIN || n.getImportance() == Notification.Importance.IMPORTANT)
                 {
-                    event.getPlayer().sendMessage(n.toPlayerFriendlyString());
-                    toDelete.add(n.getId());
+                    for(String s : n.toPlayerFriendlyStringList()) event.getPlayer().sendMessage(s);
+                    if(n.isAutoDelete()) toDelete.add(n.getId());
                     hasdisplayed = true;
                 }
                 else morecount++;

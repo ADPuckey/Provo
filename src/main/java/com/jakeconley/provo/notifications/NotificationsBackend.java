@@ -34,10 +34,19 @@ public class NotificationsBackend
         {
             ConfigurationSection section = notifications.get().getConfigurationSection(id);
             
-            String text = section.getString("text");
+            List<String> text = section.getStringList("text");
             if(text == null)
             {
                 ProvoFormatException e = new ProvoFormatException("No text set in notification " + id);
+                e.setFilePath(notifications.getFile().getPath());
+                e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+                throw e;
+            }
+            
+            String origin = section.getString("origin");
+            if(origin == null)
+            {
+                ProvoFormatException e = new ProvoFormatException("No origin set in notification " + id);
                 e.setFilePath(notifications.getFile().getPath());
                 e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
                 throw e;
@@ -65,7 +74,9 @@ public class NotificationsBackend
             
             long timestamp = section.getLong("timestamp", Notification.TIMESTAMP_DEFAULT);
             
-            ret.add(new Notification(id, text, importance, timestamp));
+            Notification res = new Notification(id, origin, text, importance, timestamp);
+            res.setAutoDelete(section.getBoolean("autodelete", Notification.AUTODELETE_DEFAULT));
+            ret.add(res);
         }
         
         return ret;
@@ -96,8 +107,10 @@ public class NotificationsBackend
         ConfigurationSection section = notifications.get().getConfigurationSection(n.getId());
         if(section == null) section = notifications.get().createSection(n.getId());
         section.set("text", n.getText());
+        section.set("origin", n.getOrigin());
         section.set("importance", n.getImportance().toString());
         if(n.getTimestamp() != Notification.TIMESTAMP_DEFAULT) section.set("timestamp", n.getTimestamp());
+        if(n.isAutoDelete() != Notification.AUTODELETE_DEFAULT) section.set("autodelete", n.isAutoDelete());
         notifications.SaveFile();
     }
     
