@@ -20,3 +20,9 @@ commands:
   math:
     description: Do some math!
     usage: /math <math query> or /math help
+  remind:
+    description: Set a reminder for yourself, you'll see it next time you log in.
+    usage: /remind <a message for yourself>
+  del-reminders:
+    description: Acknowledge and delete all of your current reminders.
+    usage: Use /del-reminders

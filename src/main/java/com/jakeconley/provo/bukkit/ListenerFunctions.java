@@ -36,21 +36,21 @@ public class ListenerFunctions implements Listener
                 if(e.getClickedBlock().getType() == Material.CHEST){ inventory = ((Chest) e.getClickedBlock().getState()).getInventory(); }
                 else return;
                 
-                PreferencesClass pclass = plugin.getSortingCommands().getVerifiedClass(e.getPlayer());
+                PreferencesClass pclass = plugin.getSortingCommandExecutor().getVerifiedClass(e.getPlayer());
                 
                 if(inventory instanceof DoubleChestInventory && pclass.getTargetType() != InventoryType.DOUBLECHEST)
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Notice:" + ChatColor.RESET + ChatColor.YELLOW + " You're applying a " + pclass.getTargetType().toString() + " class to a double chest; only the first 3 rows can follow the class's rules.");
                 else if(!(inventory instanceof DoubleChestInventory) && pclass.getTargetType() != InventoryType.CHEST)
                 {
                     e.getPlayer().sendMessage(ChatColor.YELLOW + "You can't apply a " + pclass.getTargetType().toString() + " rule to a single chest!");
-                    plugin.getSortingCommands().resetVerifiedClass(e.getPlayer());
+                    plugin.getSortingCommandExecutor().resetVerifiedClass(e.getPlayer());
                     plugin.setPlayerStatus(e.getPlayer(), FunctionStatus.IDLE);
                     return;
                 }
                 
                 Sorting.FrontendExecute(e.getPlayer(), inventory, pclass, plugin.getSortingPreferencesBackend());
                 
-                plugin.getSortingCommands().resetVerifiedClass(e.getPlayer());
+                plugin.getSortingCommandExecutor().resetVerifiedClass(e.getPlayer());
                 plugin.setPlayerStatus(e.getPlayer(), FunctionStatus.IDLE);
                 //return;
             //default: return;

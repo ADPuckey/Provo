@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 public class CommandsGeneral implements CommandExecutor
 {
-    private Provo plugin;
+    private final Provo plugin;
     public CommandsGeneral(Provo _plugin){ this.plugin = _plugin; }
     
     @Override

@@ -19,8 +19,8 @@ public class Provo extends JavaPlugin implements Listener
     
     public static boolean Debug = true;
     
-    private SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
-    private NotificationsBackend NotificationsBackend = new NotificationsBackend();
+    private final SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
+    private final NotificationsBackend NotificationsBackend = new NotificationsBackend();
     public SortingPreferencesBackend getSortingPreferencesBackend(){ return new SortingPreferencesBackend(); }
     public NotificationsBackend getNotificationsBackend(){ return new NotificationsBackend(); }
     
@@ -35,9 +35,10 @@ public class Provo extends JavaPlugin implements Listener
     private Settings Settings;
     public Settings getSettings(){ return Settings; }
     
-    private CommandsGeneral GeneralCommands = new CommandsGeneral(this);
-    private CommandsSorting SortingCommands = new CommandsSorting(this);
-    public CommandsSorting getSortingCommands(){ return SortingCommands; }
+    private final CommandsGeneral GeneralCommands   = new CommandsGeneral(this);
+    private final CommandsSorting SortingCommands   = new CommandsSorting(this);
+    private final CommandsNotes NotesCommands	    = new CommandsNotes(this);
+    public CommandsSorting getSortingCommandExecutor(){ return SortingCommands; }
     
     @Override
     public void onEnable()
@@ -50,7 +51,10 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("sortinginfo").setExecutor(SortingCommands);
         getCommand("view-notifications").setExecutor(GeneralCommands);
         getCommand("math").setExecutor(GeneralCommands);
+	getCommand("remind").setExecutor(NotesCommands);
+	getCommand("del-reminders").setExecutor(NotesCommands);
         
+	// Initialization of player statuses
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }
         
         getServer().getPluginManager().registerEvents(this, this);

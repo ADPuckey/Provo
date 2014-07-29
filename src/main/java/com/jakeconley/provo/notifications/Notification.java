@@ -36,7 +36,18 @@ public class Notification
         this.Importance = _Importance;
         this.Timestamp = _Timestamp;
     }
+    /**
+     * @param _Id The ID of the notification being stored
+     * @param _Origin The name of the feature or plugin sending it (e.g. "Mail" or "Essentials")
+     * @param _Text A list of messages to be sent to the player
+     * @param _Importance The importance of the message
+     */
     public Notification(String _Id, String _Origin, List<String> _Text, Importance _Importance){ this(_Id, _Origin, _Text, _Importance, (new Date()).getTime()); }
+    /**
+     * @param _Id The ID of the notification being stored
+     * @param _Origin The name of the feature or plugin sending it (e.g. "Mail" or "Essentials")
+     * @param _Importance The importance of the message
+     */
     public Notification(String _Id, String _Origin, Importance _Importance){ this(_Id, _Origin, new LinkedList<String>(), _Importance); }
     
     public String CalcTimeOffset()

@@ -18,6 +18,61 @@ public class NotificationsBackend
         return file;
     }
     
+    private Notification NotificationFromFile(YamlFile notifications, String id) throws ProvoFormatException, Exception
+    {
+	ConfigurationSection section = notifications.get().getConfigurationSection(id);
+	if(section == null) return null;
+
+	List<String> text = section.getStringList("text");
+	if(text == null)
+	{
+	    ProvoFormatException e = new ProvoFormatException("No text set in notification " + id);
+	    e.setFilePath(notifications.getFile().getPath());
+	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    throw e;
+	}
+
+	String origin = section.getString("origin");
+	if(origin == null)
+	{
+	    ProvoFormatException e = new ProvoFormatException("No origin set in notification " + id);
+	    e.setFilePath(notifications.getFile().getPath());
+	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    throw e;
+	}
+
+	Importance importance = Importance.DISPLAY_ON_JOIN;
+	try
+	{
+	    String str = section.getString("importance");
+	    if(str == null) 
+	    {
+		ProvoFormatException e = new ProvoFormatException("No importance set in notification " + id);
+		e.setFilePath(notifications.getFile().getPath());
+		throw e;
+	    }
+	    importance = Importance.valueOf(str);
+	}
+	catch(IllegalArgumentException exc)
+	{
+	    ProvoFormatException e = new ProvoFormatException("Invalid importance in notification " + id);
+	    e.setFilePath(notifications.getFile().getPath());
+	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    throw e;
+	}
+
+	long timestamp = section.getLong("timestamp", Notification.TIMESTAMP_DEFAULT);
+
+	Notification ret = new Notification(id, origin, text, importance, timestamp);
+	ret.setAutoDelete(section.getBoolean("autodelete", Notification.AUTODELETE_DEFAULT));
+	return ret;
+    }
+    
+    public Notification GetNotification(String uuid, String id) throws ProvoFormatException, Exception
+    {
+        YamlFile notifications = LoadPlayerNotificationsFile(uuid);
+	return NotificationFromFile(notifications, id);
+    }
     /**
      * Get the list of notifications waiting to be viewed by a player.
      * @param uuid The UUID of the player whose notifications are to be fetched
@@ -28,57 +83,8 @@ public class NotificationsBackend
     public List<Notification> GetNotifications(String uuid) throws ProvoFormatException, Exception
     {
         YamlFile notifications = LoadPlayerNotificationsFile(uuid);
-        List<Notification> ret = new LinkedList<>();
-        
-        for(String id : notifications.get().getKeys(false))
-        {
-            ConfigurationSection section = notifications.get().getConfigurationSection(id);
-            
-            List<String> text = section.getStringList("text");
-            if(text == null)
-            {
-                ProvoFormatException e = new ProvoFormatException("No text set in notification " + id);
-                e.setFilePath(notifications.getFile().getPath());
-                e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
-                throw e;
-            }
-            
-            String origin = section.getString("origin");
-            if(origin == null)
-            {
-                ProvoFormatException e = new ProvoFormatException("No origin set in notification " + id);
-                e.setFilePath(notifications.getFile().getPath());
-                e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
-                throw e;
-            }
-            
-            Importance importance = Importance.DISPLAY_ON_JOIN;
-            try
-            {
-                String str = section.getString("importance");
-                if(str == null) 
-                {
-                    ProvoFormatException e = new ProvoFormatException("No importance set in notification " + id);
-                    e.setFilePath(notifications.getFile().getPath());
-                    throw e;
-                }
-                importance = Importance.valueOf(str);
-            }
-            catch(IllegalArgumentException exc)
-            {
-                ProvoFormatException e = new ProvoFormatException("Invalid importance in notification " + id);
-                e.setFilePath(notifications.getFile().getPath());
-                e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
-                throw e;
-            }
-            
-            long timestamp = section.getLong("timestamp", Notification.TIMESTAMP_DEFAULT);
-            
-            Notification res = new Notification(id, origin, text, importance, timestamp);
-            res.setAutoDelete(section.getBoolean("autodelete", Notification.AUTODELETE_DEFAULT));
-            ret.add(res);
-        }
-        
+        List<Notification> ret = new LinkedList<>();        
+        for(String id : notifications.get().getKeys(false)) ret.add(NotificationFromFile(notifications, id));
         return ret;
     }
     
