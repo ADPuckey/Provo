@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -187,6 +188,19 @@ if(label.equalsIgnoreCase("recipe"))
         return true;
     }
     
+}
+if(label.equalsIgnoreCase("unenchant"))
+{
+    if(player == null){ Messages.Player(sender); return true; }
+    
+    ItemStack is = player.getInventory().getItemInHand();
+    Map<Enchantment, Integer> enchantments = is.getEnchantments();
+    
+    if(enchantments.isEmpty()){ player.sendMessage(ChatColor.YELLOW + "That item doesn't contain any enchantments!"); return true; }
+    
+    for(Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) is.removeEnchantment(entry.getKey());
+    player.sendMessage(ChatColor.YELLOW + "Successfully removed enchantments on that item.");
+    return true;
 }
 
         // End

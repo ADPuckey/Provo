@@ -29,3 +29,6 @@ commands:
   recipe:
     description: View the recipe of an item.
     usage: /recipe <item name> [page]
+  unenchant:
+    description: REMOVE the enchantment on the item you are currently holding.
+    usage: /unenchant
