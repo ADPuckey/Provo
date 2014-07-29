@@ -63,7 +63,8 @@ public class NotificationsBackend
 
 	long timestamp = section.getLong("timestamp", Notification.TIMESTAMP_DEFAULT);
 
-	Notification ret = new Notification(id, origin, text, importance, timestamp);
+	Notification ret = new Notification(id, origin, text, importance);
+        ret.setTimestamp(timestamp);
 	ret.setAutoDelete(section.getBoolean("autodelete", Notification.AUTODELETE_DEFAULT));
 	return ret;
     }

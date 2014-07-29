@@ -16,7 +16,7 @@ commands:
     usage: /sortinginfo [page]
   view-notifications:
     description: View your remaining notifications.
-    usage: Use /view-notifications.
+    usage: /view-notifications.
   math:
     description: Do some math!
     usage: /math <math query> or /math help
@@ -25,4 +25,7 @@ commands:
     usage: /remind <a message for yourself>
   del-reminders:
     description: Acknowledge and delete all of your current reminders.
-    usage: Use /del-reminders
+    usage: /del-reminders
+  recipe:
+    description: View the recipe of an item.
+    usage: /recipe <item name> [page]

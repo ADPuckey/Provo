@@ -16,7 +16,7 @@ public class Notification
     private final List<String> Text;
     private final String Origin;
     private final Importance Importance;
-    private final long Timestamp;
+    private long Timestamp;
     private boolean AutoDelete;
     
     public String getId(){ return Id; }
@@ -27,8 +27,10 @@ public class Notification
     public boolean isAutoDelete(){ return AutoDelete; }
     public Notification addText(String line){ Text.add(line); return this; }
     public Notification setAutoDelete(boolean value){ AutoDelete = value; return this; }
+    public Notification removeTimestamp(){ Timestamp = TIMESTAMP_DEFAULT; return this; }
+    Notification setTimestamp(long value){ Timestamp = value; return this; }
     
-    Notification(String _Id, String _Origin, List<String> _Text, Importance _Importance, long _Timestamp)
+    private Notification(String _Id, String _Origin, List<String> _Text, Importance _Importance, long _Timestamp)
     {
         this.Id = _Id;
         this.Origin = _Origin;
@@ -80,7 +82,6 @@ public class Notification
             if(Importance == Importance.IMPORTANT) sb.append(ChatColor.RED).append("[!] ");
             if(Origin != null) sb.append(ChatColor.GREEN).append("[").append(Origin).append("] ");
             if(time != null){ sb.append(ChatColor.GREEN).append("[").append(time).append("] ");}
-            else{ sb.append(ChatColor.GREEN).append("[ ] "); }
             sb.append(ChatColor.RESET);
             sb.append(s);
             ret.add(sb.toString());

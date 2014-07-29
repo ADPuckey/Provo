@@ -53,6 +53,7 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("math").setExecutor(GeneralCommands);
 	getCommand("remind").setExecutor(NotesCommands);
 	getCommand("del-reminders").setExecutor(NotesCommands);
+        getCommand("recipe").setExecutor(GeneralCommands);
         
 	// Initialization of player statuses
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }

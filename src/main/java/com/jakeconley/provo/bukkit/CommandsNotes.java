@@ -60,7 +60,8 @@ if(label.equalsIgnoreCase("remind"))
 	    text.add(ChatColor.YELLOW + "Use /del-reminders to acknowledge and delete these reminders.");
 	    
 	    Notification n = new Notification(NOTIFICATION_REMINDER_ID, "Reminder", text, Notification.Importance.IMPORTANT);
-	    n.setAutoDelete(false);	    
+	    n.setAutoDelete(false);
+            n.removeTimestamp();
 	    plugin.getNotificationsBackend().WriteNotification(player_uuid, n);
 	    
 	    sender.sendMessage(ChatColor.GREEN + "Successfully created reminder.");
