@@ -17,3 +17,6 @@ commands:
   view-notifications:
     description: View your remaining notifications.
     usage: Use /view-notifications.
+  math:
+    description: Do some math!
+    usage: /math <math query> or /math help

@@ -49,6 +49,7 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("sorting").setExecutor(SortingCommands);
         getCommand("sortinginfo").setExecutor(SortingCommands);
         getCommand("view-notifications").setExecutor(GeneralCommands);
+        getCommand("math").setExecutor(GeneralCommands);
         
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }
         
