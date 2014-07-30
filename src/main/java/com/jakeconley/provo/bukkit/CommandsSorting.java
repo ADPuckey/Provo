@@ -163,7 +163,7 @@ if(label.equalsIgnoreCase("sortinginfo"))
     {
         case 1:
             sender.sendMessage(ChatColor.AQUA + "This guide is meant as a quick start.");
-            sender.sendMessage(ChatColor.AQUA + "For more information and tutorials, please visit <NOT IMPLMENETED>.");
+            sender.sendMessage(ChatColor.AQUA + "For more information and tutorials, please visit http://jakeconley.com/provo/sorting.php");
             sender.sendMessage("In order to sort, one needs a class.  By default, you are given a class named \"base\".");
             sender.sendMessage("A class is a set of rules that tells the plugin exactly how you want your inventory sorted.");
             sender.sendMessage("To sort your inventory, just type \"/sort base\"!  If you wish to sort again, you can just type \"/sort\".");

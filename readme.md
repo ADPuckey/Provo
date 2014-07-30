@@ -1,20 +1,27 @@
-Provo
+Provo (1.0!)
 =====
 
 Provo is a plugin with a bunch of features for Bukkit I found were missing from other plugins so I compiled them myself.
 
-Some examples of planned features for now:
+Some examples of the features integrated now:
 
 * Inventory sorting
+* Mailing
+* Reminders
+* Measurement
+* /math
+* /recipe
+* /unenchant
+
+For the future:
+
 * Sign editing
 * Additional redstone blocks
-* Mailing
-* Distance measuring and planning tools
-* /math
-* Notepad
-* Inventory storage via a single command
 * Admin chat
 * Unenchantment
+* Notepad
+* Inventory storage via a single command
+* Planning tools
 
 And many more!
 

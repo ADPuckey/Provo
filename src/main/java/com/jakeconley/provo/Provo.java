@@ -21,7 +21,7 @@ public class Provo extends JavaPlugin implements Listener
 {
     public static String COMMAND_TRADEMARK = org.bukkit.ChatColor.GREEN + "-- Provo by HAPPYGOPUCKEY --";
     
-    public static boolean Debug = true;
+    public static boolean Debug = false;
     
     private final SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
     private final NotificationsBackend NotificationsBackend = new NotificationsBackend();
