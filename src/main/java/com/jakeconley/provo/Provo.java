@@ -38,6 +38,8 @@ public class Provo extends JavaPlugin implements Listener
     private final CommandsGeneral GeneralCommands   = new CommandsGeneral(this);
     private final CommandsSorting SortingCommands   = new CommandsSorting(this);
     private final CommandsNotes NotesCommands	    = new CommandsNotes(this);
+    private final CommandsMath MathCommands         = new CommandsMath(this);
+    private final CommandsPlugin PluginCommands     = new CommandsPlugin(this);
     public CommandsSorting getSortingCommandExecutor(){ return SortingCommands; }
     
     @Override
@@ -50,7 +52,7 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("sorting").setExecutor(SortingCommands);
         getCommand("sortinginfo").setExecutor(SortingCommands);
         getCommand("view-notifications").setExecutor(GeneralCommands);
-        getCommand("math").setExecutor(GeneralCommands);
+        getCommand("math").setExecutor(MathCommands);
 	getCommand("remind").setExecutor(NotesCommands);
 	getCommand("del-reminders").setExecutor(NotesCommands);
         getCommand("recipe").setExecutor(GeneralCommands);
