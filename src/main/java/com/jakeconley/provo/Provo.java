@@ -1,11 +1,15 @@
 package com.jakeconley.provo;
 
+import com.jakeconley.provo.backend.MailBackend;
 import com.jakeconley.provo.backend.SortingPreferencesBackend;
 import com.jakeconley.provo.bukkit.*;
 import com.jakeconley.provo.notifications.Notification;
 import com.jakeconley.provo.notifications.NotificationsBackend;
 import com.jakeconley.provo.utils.Utils;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,8 +25,10 @@ public class Provo extends JavaPlugin implements Listener
     
     private final SortingPreferencesBackend SortingPreferencesBackend = new SortingPreferencesBackend();
     private final NotificationsBackend NotificationsBackend = new NotificationsBackend();
+    private final MailBackend MailBackend = new MailBackend();
     public SortingPreferencesBackend getSortingPreferencesBackend(){ return new SortingPreferencesBackend(); }
     public NotificationsBackend getNotificationsBackend(){ return new NotificationsBackend(); }
+    public MailBackend getMailBackend(){ return MailBackend; }
     
     private final HashMap<Player, FunctionStatus> PlayerStatuses = new HashMap<>();
     public FunctionStatus getPlayerStatus(Player p){ return PlayerStatuses.get(p); }
@@ -57,6 +63,7 @@ public class Provo extends JavaPlugin implements Listener
 	getCommand("del-reminders").setExecutor(NotesCommands);
         getCommand("recipe").setExecutor(GeneralCommands);
         getCommand("unenchant").setExecutor(GeneralCommands);
+        getCommand("mail").setExecutor(NotesCommands);
         
 	// Initialization of player statuses
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }
@@ -74,17 +81,28 @@ public class Provo extends JavaPlugin implements Listener
         Utils.Info("Plugin disabled.");
     }
     
-    public void SendNotification(Player p, Notification n)
+    /**
+     * Send a notification to a player.
+     * @param p The recipient player
+     * @param id The id of the notification as stored in the backend.  This is what will be written, overwritten, and deleted.
+     * @param origin The display name of the plugin or feature sending the notification.  For example, "Mail".
+     * @param text The list of messages to display.  
+     * @param importance The importance for the notification.
+     */
+    public void SendNotification(UUID recipient, String id, String origin, List<String> text, Notification.Importance importance)
     {
-        if(p.isOnline())
+        Notification n = new Notification(id, origin, text, importance);
+        Player p = getServer().getPlayer(recipient);
+        
+        if(p != null && p.isOnline())
         {
-            for(String line : n.getText()) p.sendMessage(line);
+            for(String line : n.getText()) p.sendMessage(ChatColor.AQUA + "[" + origin + "] " + ChatColor.RESET + line);
             return;
         }
         
         try
         {
-            NotificationsBackend.WriteNotification(p.getUniqueId().toString(), n);
+            NotificationsBackend.WriteNotification(recipient.toString(), n);
         }
         catch(Exception e)
         {

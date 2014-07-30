@@ -32,3 +32,6 @@ commands:
   unenchant:
     description: REMOVE the enchantment on the item you are currently holding.
     usage: /unenchant
+  mail:
+    description: Send and receive mail!
+    usage: Use /mail help for a list of commands.

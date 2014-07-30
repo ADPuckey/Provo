@@ -1,17 +1,20 @@
 package com.jakeconley.provo.utils;
 
+import com.evilmidget38.NameFetcher;
+import com.evilmidget38.UUIDFetcher;
 import com.jakeconley.provo.Provo;
-//import com.evilmidget38.UUIDFetcher;
-//import com.evilmidget38.NameFetcher;
+import static com.jakeconley.provo.notifications.Notification.TIMESTAMP_DEFAULT;
 import java.util.Arrays;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.Location;
-import java.util.logging.Logger;
-import java.util.UUID;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Logger;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 
 public class Utils
 {
@@ -78,8 +81,24 @@ public class Utils
         try{ return Integer.parseInt(integer); }
         catch(NumberFormatException e){ return def; }
     }
-
-    /*
+    
+    public static String TimeOffsetMilliseconds(long Timestamp)
+    {
+        long diff = (new Date()).getTime() - Timestamp;
+        
+        long SECOND = 1000;
+        long MINUTE = SECOND * 60;
+        long HOUR = MINUTE * 60;
+        long DAY = HOUR * 24;
+        long WEEK = DAY * 7;
+        
+        if(diff > WEEK) return (Long.toString((diff - (diff % WEEK)) / WEEK) + " week(s) ago");
+        if(diff > DAY) return (Long.toString((diff - (diff % DAY)) / DAY) + " day(s) ago");
+        if(diff > HOUR) return (Long.toString((diff - (diff%HOUR)) / HOUR) + " hour(s) ago");
+        if(diff > MINUTE) return (Long.toString((diff - (diff%MINUTE)) / MINUTE) + " minute(s) ago");
+        return (Long.toString((diff - (diff % SECOND)) / SECOND) + " second(s) ago");
+    }
+    
     public static UUID ResolveUUID(String name)
     {
         if(name == null) return null;
@@ -102,7 +121,7 @@ public class Utils
         catch(Exception e)
         {
             Severe("Exception " + e.toString() + " while resolving UUIDs");
-            return null;
+            return new HashMap<>();
         }
     }
     public static String ResolveName(UUID uuid)
@@ -128,8 +147,7 @@ public class Utils
         {
             Severe("Exception " + e.toString() + " while resolving names.");
             e.printStackTrace();
-            return null;
+            return new HashMap<>();
         }
     }
-    */
 }

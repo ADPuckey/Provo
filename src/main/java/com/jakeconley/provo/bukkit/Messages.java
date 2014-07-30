@@ -23,8 +23,8 @@ public class Messages
                 if(e.getOrigin() == ProvoFormatException.Origin.PUBLIC) sender.sendMessage(ChatColor.YELLOW + "This is due to an invalid server configuration.");
                 else sender.sendMessage(ChatColor.YELLOW + "This means you somehow created two classes that inherit each other, creating an infinite loop.");
                 break;
-            case NOTIFICATION_FORMAT:
-                sender.sendMessage(ChatColor.RED + "Error while retrieving your notifications.");
+            case BACKEND_FORMAT:
+                sender.sendMessage(ChatColor.RED + "Formatting error!");
                 break;
             default:
                 sender.sendMessage(ChatColor.RED + "An unknown error occured.");

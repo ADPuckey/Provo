@@ -28,7 +28,7 @@ public class NotificationsBackend
 	{
 	    ProvoFormatException e = new ProvoFormatException("No text set in notification " + id);
 	    e.setFilePath(notifications.getFile().getPath());
-	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    e.setType(ProvoFormatException.Type.BACKEND_FORMAT);
 	    throw e;
 	}
 
@@ -37,7 +37,7 @@ public class NotificationsBackend
 	{
 	    ProvoFormatException e = new ProvoFormatException("No origin set in notification " + id);
 	    e.setFilePath(notifications.getFile().getPath());
-	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    e.setType(ProvoFormatException.Type.BACKEND_FORMAT);
 	    throw e;
 	}
 
@@ -57,7 +57,7 @@ public class NotificationsBackend
 	{
 	    ProvoFormatException e = new ProvoFormatException("Invalid importance in notification " + id);
 	    e.setFilePath(notifications.getFile().getPath());
-	    e.setType(ProvoFormatException.Type.NOTIFICATION_FORMAT);
+	    e.setType(ProvoFormatException.Type.BACKEND_FORMAT);
 	    throw e;
 	}
 
