@@ -26,4 +26,8 @@ public class Comparators
             return 0;
         }
     }
+    public static class COORDINATEAXIS_ASCENDING implements Comparator<CoordinateAxis>
+    {
+        @Override public int compare(CoordinateAxis o1, CoordinateAxis o2){ return o1.compareTo(o2); }
+    }
 }

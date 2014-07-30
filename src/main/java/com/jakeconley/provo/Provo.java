@@ -44,9 +44,10 @@ public class Provo extends JavaPlugin implements Listener
     private final CommandsGeneral GeneralCommands   = new CommandsGeneral(this);
     private final CommandsSorting SortingCommands   = new CommandsSorting(this);
     private final CommandsNotes NotesCommands	    = new CommandsNotes(this);
-    private final CommandsMath MathCommands         = new CommandsMath(this);
+    private final CommandsPlanning PlanningCommands         = new CommandsPlanning(this);
     private final CommandsPlugin PluginCommands     = new CommandsPlugin(this);
     public CommandsSorting getSortingCommandExecutor(){ return SortingCommands; }
+    public CommandsPlanning getPlanningCommandExecutor(){ return PlanningCommands; }
     
     @Override
     public void onEnable()
@@ -58,12 +59,13 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("sorting").setExecutor(SortingCommands);
         getCommand("sortinginfo").setExecutor(SortingCommands);
         getCommand("view-notifications").setExecutor(GeneralCommands);
-        getCommand("math").setExecutor(MathCommands);
+        getCommand("math").setExecutor(GeneralCommands);
 	getCommand("remind").setExecutor(NotesCommands);
 	getCommand("del-reminders").setExecutor(NotesCommands);
         getCommand("recipe").setExecutor(GeneralCommands);
         getCommand("unenchant").setExecutor(GeneralCommands);
         getCommand("mail").setExecutor(NotesCommands);
+        getCommand("measure").setExecutor(PlanningCommands);
         
 	// Initialization of player statuses
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }

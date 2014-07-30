@@ -104,6 +104,7 @@ if(label.equalsIgnoreCase("mail"))
     {
         if(player == null){ Messages.Player(sender); return true; }
         if(!Verify.ArgsLength(cmd, sender, args, 3, "/mail send <playername> <message...>")) return true;
+        if(!Verify.Permission(plugin, sender, "provo.mail.send", true)) return true;
         
         final String target_name = args[1];
         
