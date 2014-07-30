@@ -66,7 +66,7 @@ public class Notification
             StringBuilder sb = new StringBuilder();
             if(Importance == Importance.IMPORTANT) sb.append(ChatColor.RED).append("[!] ");
             if(Origin != null) sb.append(ChatColor.GREEN).append("[").append(Origin).append("] ");
-            if(time != null){ sb.append(ChatColor.GREEN).append("[").append(time).append("] ");}
+            if(Timestamp != 0 && time != null){ sb.append(ChatColor.GREEN).append("[").append(time).append("] ");}
             sb.append(ChatColor.RESET);
             sb.append(s);
             ret.add(sb.toString());

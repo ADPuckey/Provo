@@ -66,6 +66,7 @@ public class Provo extends JavaPlugin implements Listener
         getCommand("unenchant").setExecutor(GeneralCommands);
         getCommand("mail").setExecutor(NotesCommands);
         getCommand("measure").setExecutor(PlanningCommands);
+        getCommand("provo").setExecutor(PluginCommands);
         
 	// Initialization of player statuses
         for(Player p : getServer().getOnlinePlayers()){ PlayerStatuses.put(p, FunctionStatus.IDLE); }
@@ -99,7 +100,6 @@ public class Provo extends JavaPlugin implements Listener
         if(p != null && p.isOnline())
         {
             for(String line : n.getText()) p.sendMessage(ChatColor.AQUA + "[" + origin + "] " + ChatColor.RESET + line);
-            return;
         }
         
         try

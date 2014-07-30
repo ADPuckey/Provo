@@ -38,3 +38,6 @@ commands:
   measure:
     description: Measure distance, perimiter, area/volume, and midpoint among several blocks.
     usage: /measure [axes of measurement, default xz]
+  provo:
+    description: List functionality and commands provided by this plugin!
+    usage: /provo
