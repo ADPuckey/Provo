@@ -364,6 +364,14 @@ if(player == null){ Messages.Player(sender); return true; }
             String inherits = null;
             InventoryType type;
             
+            try{ type = InventoryType.valueOf(args[2].toUpperCase()); }
+            catch(IllegalArgumentException e)
+            {
+                sender.sendMessage(ChatColor.YELLOW + "Invalid type!  Use PLAYER, CHEST, or DOUBLECHEST.");
+                Messages.Usage(sender, USAGE);
+                return true;
+            }
+            
             if(args[1].contains(":"))
             {
                 String[] split = args[1].split(":");
@@ -377,16 +385,13 @@ if(player == null){ Messages.Player(sender); return true; }
                     sender.sendMessage(ChatColor.YELLOW + "You don't have a class named \"" + inherits + "\" to inherit!");
                     return true;
                 }
+                if(type.getCapacity() < inheritance_check.getTargetType().getCapacity())
+                {
+                    sender.sendMessage(ChatColor.YELLOW + "You tried to inherit a " + inheritance_check.getTargetType() + " class, which is bigger than " + type + ".  This is to be fixed later, but cannot be done as of now, sorry.");
+                    return true;
+                }
             }
             else name = args[1];
-            
-            try{ type = InventoryType.valueOf(args[2].toUpperCase()); }
-            catch(IllegalArgumentException e)
-            {
-                sender.sendMessage(ChatColor.YELLOW + "Invalid type!  Use PLAYER, CHEST, or DOUBLECHEST.");
-                Messages.Usage(sender, USAGE);
-                return true;
-            }
             
             PreferencesClass res = new PreferencesClass(name, type, new LinkedList<PreferencesRule>());
             if(inherits != null) res.setInheritance(inherits);
