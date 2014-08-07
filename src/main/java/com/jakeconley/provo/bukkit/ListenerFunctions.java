@@ -65,6 +65,7 @@ switch(plugin.getPlayerStatus(event.getPlayer()))
 
     case MEASURING_BLOCK:
         if(event.getAction() == Action.LEFT_CLICK_BLOCK) event.setCancelled(true);
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) event.setCancelled(true);
         MeasuringState measuringstate = plugin.getPlanningCommandExecutor().getMeasuringState(player);
         
         if(!block.getLocation().getWorld().equals(measuringstate.getWorld()))
