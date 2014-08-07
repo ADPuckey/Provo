@@ -33,7 +33,7 @@ public class CommandsPlugin implements CommandExecutor
      Utils.ShowCommand(sender, "/math <math>", "Do some math. Use /math help for more info.");
      Utils.ShowCommand(sender, "/measure", "Measure distance, area, perimiter, etc between two blocks.");
      Utils.ShowCommand(sender, "/mail send <recipient> <message...>", "Send mail to a player!");
-     Utils.ShowCommand(sender, "/remind <message>...", "Reminds you to do something next time you log in.");
+     Utils.ShowCommand(sender, "/remind <message...>", "Reminds you to do something next time you log in.");
      Utils.ShowCommand(sender, "/recipe <item>", "Show the crafting recipe for a particular item.");
      Utils.ShowCommand(sender, "/unenchant", "Removes ALL enchantments on the item in your hand.");
      return true;
