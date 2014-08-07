@@ -49,6 +49,8 @@ public class Utils
         
         // MATERIAL FIXES GO HERE
         if(s.equalsIgnoreCase("carrot")) m = Material.CARROT_ITEM;
+        if(s.equalsIgnoreCase("potato")) m = Material.POTATO_ITEM;
+        if(s.equalsIgnoreCase("lead")) m = Material.LEASH;
         
         return m;
     }
