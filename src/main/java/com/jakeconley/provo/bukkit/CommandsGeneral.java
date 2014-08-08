@@ -2,8 +2,8 @@ package com.jakeconley.provo.bukkit;
 
 import com.jakeconley.provo.Provo;
 import com.jakeconley.provo.backend.ProvoFormatException;
-import com.jakeconley.provo.functions.math.MathSyntaxException;
-import com.jakeconley.provo.functions.math.Maths;
+import com.jakeconley.provo.features.math.MathSyntaxException;
+import com.jakeconley.provo.features.math.Maths;
 import com.jakeconley.provo.notifications.Notification;
 import com.jakeconley.provo.utils.Utils;
 import java.util.HashMap;

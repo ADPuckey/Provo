@@ -1,7 +1,7 @@
 package com.jakeconley.provo.backend;
 
-import com.jakeconley.provo.functions.mail.Mail;
-import com.jakeconley.provo.functions.mail.MailResult;
+import com.jakeconley.provo.features.mail.Mail;
+import com.jakeconley.provo.features.mail.MailResult;
 import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.yaml.YamlFile;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.planning;
+package com.jakeconley.provo.features.planning;
 
 import java.util.LinkedList;
 import java.util.List;

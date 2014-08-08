@@ -1,7 +1,7 @@
 package com.jakeconley.provo.backend;
 
-import com.jakeconley.provo.functions.sorting.PreferencesClass;
-import com.jakeconley.provo.functions.sorting.PreferencesRule;
+import com.jakeconley.provo.features.sorting.PreferencesClass;
+import com.jakeconley.provo.features.sorting.PreferencesRule;
 import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.utils.inventory.InventoryCoords;
 import com.jakeconley.provo.utils.inventory.InventoryRange;

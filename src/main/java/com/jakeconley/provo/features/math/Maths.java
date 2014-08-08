@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.math;
+package com.jakeconley.provo.features.math;
 
 import com.jakeconley.miscellanea.util.Tree;
 import com.jakeconley.provo.Provo;

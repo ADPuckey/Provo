@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.mail;
+package com.jakeconley.provo.features.mail;
 
 import com.jakeconley.provo.utils.Utils;
 import java.util.HashSet;
