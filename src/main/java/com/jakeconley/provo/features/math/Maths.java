@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Maths
-{
+{    
     private static enum CharType{ WORD, NUMBER, WHITESPACE, OTHER }
     private static CharType analyzechar(char c)
     {
@@ -62,7 +62,7 @@ public class Maths
         }
     }
 
-    private static enum Lex{ NUMBER, OPERATOR, OTHER }
+    private static enum Lex{ TOKEN, NUMBER, OPERATOR, OTHER }
     
     private static enum OperatorSyntax
     {
@@ -72,7 +72,7 @@ public class Maths
     }
     private static enum Operations{ UNDEFINED, EXPONENTIATION, MULTIPLICATION, ADDITION }
     private static enum Operator
-    {        
+    {
         ADD("+", OperatorSyntax.BINARY, Operations.ADDITION),
         SUBTRACT("-", OperatorSyntax.BINARY, Operations.ADDITION),
         MULTIPLY("*", OperatorSyntax.BINARY, Operations.MULTIPLICATION),
@@ -104,6 +104,25 @@ public class Maths
             return UNKNOWN;
         }
     }
+    
+    private static enum Constant
+    {
+        PI("pi", Math.PI),
+        GOLDEN_RATIO("phi", (1 + Math.sqrt(5)) / 2),
+        UNKNOWN(null, Double.NaN);
+        
+        public final String Text;
+        public final double Value;
+        
+        Constant(String text, Double value){ Text = text; Value = value; }
+        
+        public static Constant FromString(String s)
+        {
+            for(Constant t : Constant.values()){ if(t != UNKNOWN && t.Text.equals(s)) return t; }
+            return UNKNOWN;
+        }
+    }
+    
     private static class Symbol
     {
         public Lex Type;
@@ -129,6 +148,14 @@ public class Maths
                 return ret;
             }
             catch(NumberFormatException e) { }
+            
+            Constant constant = Constant.FromString(s);
+            if(constant != Constant.UNKNOWN)
+            {
+                Symbol ret = new Symbol(Lex.NUMBER, s);
+                ret.Value = constant.Value;
+                return ret;
+            }
             
             Operator token = Operator.FromString(s);
             if(token != Operator.UNKNOWN)
@@ -247,8 +274,8 @@ public class Maths
         for(Operations operation : Operations.values())
         {
             Utils.Debug("For opereration " + operation.toString());
-            for(int i = node.getChildren().size() - 1; i >= 0; i--)
-            {//backwards
+            for(int i = 0; i < node.getChildren().size(); i++)
+            {//Used to be backwards here?  More testing to follow
                 if(node.getChildren().get(i).getValue().Symbol == null)
                 {
                     double res = Evaluate(node.getChildren().get(i));
@@ -357,7 +384,7 @@ public class Maths
         if(Provo.Debug)
         {
             tree.print();
-            Utils.Debug(Double.toString(Evaluate(tree.getRoot())));
+            Utils.PrlnDebug(Double.toString(Evaluate(tree.getRoot())));
         }
         return Evaluate(tree.getRoot());
     }
