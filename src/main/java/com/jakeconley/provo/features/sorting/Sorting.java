@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.sorting;
+package com.jakeconley.provo.features.sorting;
 
 import com.jakeconley.provo.Provo;
 import com.jakeconley.provo.backend.ProvoFormatException;

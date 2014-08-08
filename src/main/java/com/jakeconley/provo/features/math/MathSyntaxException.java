@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.math;
+package com.jakeconley.provo.features.math;
 
 public class MathSyntaxException extends Exception
 {

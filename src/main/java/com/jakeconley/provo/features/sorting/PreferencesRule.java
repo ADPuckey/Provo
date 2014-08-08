@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.sorting;
+package com.jakeconley.provo.features.sorting;
 
 import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.utils.inventory.InventoryRange;

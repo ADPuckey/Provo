@@ -1,6 +1,6 @@
 package com.jakeconley.provo.utils;
 
-import com.jakeconley.provo.functions.sorting.PreferencesRule;
+import com.jakeconley.provo.features.sorting.PreferencesRule;
 import java.util.Comparator;
 import org.bukkit.inventory.ItemStack;
 
