@@ -1,4 +1,4 @@
-package com.jakeconley.provo.features.planning;
+package com.jakeconley.provo.features.measuring;
 
 public class MeasuringOverflowException extends Exception
 {

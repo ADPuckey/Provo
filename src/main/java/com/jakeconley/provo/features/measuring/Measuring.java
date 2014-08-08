@@ -1,4 +1,4 @@
-package com.jakeconley.provo.features.planning;
+package com.jakeconley.provo.features.measuring;
 
 import com.jakeconley.provo.utils.CoordinateAxis;
 import java.util.HashMap;

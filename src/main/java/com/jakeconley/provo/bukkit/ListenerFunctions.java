@@ -2,9 +2,9 @@ package com.jakeconley.provo.bukkit;
 
 import com.jakeconley.provo.FunctionStatus;
 import com.jakeconley.provo.Provo;
-import com.jakeconley.provo.features.planning.Measuring;
-import com.jakeconley.provo.features.planning.MeasuringOverflowException;
-import com.jakeconley.provo.features.planning.MeasuringState;
+import com.jakeconley.provo.features.measuring.Measuring;
+import com.jakeconley.provo.features.measuring.MeasuringOverflowException;
+import com.jakeconley.provo.features.measuring.MeasuringState;
 import com.jakeconley.provo.features.sorting.PreferencesClass;
 import com.jakeconley.provo.features.sorting.Sorting;
 import com.jakeconley.provo.utils.inventory.InventoryType;
