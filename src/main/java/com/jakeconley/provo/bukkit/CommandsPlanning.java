@@ -2,7 +2,7 @@ package com.jakeconley.provo.bukkit;
  
 import com.jakeconley.provo.FunctionStatus;
 import com.jakeconley.provo.Provo;
-import com.jakeconley.provo.functions.planning.MeasuringState;
+import com.jakeconley.provo.features.planning.MeasuringState;
 import com.jakeconley.provo.utils.Comparators;
 import com.jakeconley.provo.utils.CoordinateAxis;
 import java.util.HashMap;

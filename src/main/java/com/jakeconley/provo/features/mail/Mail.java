@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.mail;
+package com.jakeconley.provo.features.mail;
 
 import java.util.Date;
 import java.util.UUID;

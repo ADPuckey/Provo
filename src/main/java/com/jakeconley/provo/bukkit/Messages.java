@@ -1,7 +1,7 @@
 package com.jakeconley.provo.bukkit;
 
 import com.jakeconley.provo.backend.ProvoFormatException;
-import com.jakeconley.provo.functions.math.MathSyntaxException;
+import com.jakeconley.provo.features.math.MathSyntaxException;
 import com.jakeconley.provo.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

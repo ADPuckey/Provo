@@ -1,4 +1,4 @@
-package com.jakeconley.provo.functions.sorting;
+package com.jakeconley.provo.features.sorting;
 
 import java.util.List;
 import org.bukkit.inventory.ItemStack;
