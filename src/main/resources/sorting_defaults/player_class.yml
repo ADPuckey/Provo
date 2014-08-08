@@ -1,3 +1,9 @@
+none:
+  type: PLAYER
+  rules: []
+chest:
+  type: CHEST
+  rules: []
 base:
   type: PLAYER
   rules:

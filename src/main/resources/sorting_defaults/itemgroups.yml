@@ -23,3 +23,17 @@ flowers:
     - yellow_flower
     - red_flower
     - double_plant
+plantable:
+  items:
+    - sapling
+    - carrot
+    - melon seeds
+    - pumpkin seeds
+    - potato item
+    - seeds
+buckets:
+  items:
+    - bucket
+    - milk bucket
+    - lava bucket
+    - water bucket
