@@ -84,6 +84,8 @@ public class CommandsSorting implements CommandExecutor
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
+        args = Utils.GroupStringArgQuotes(args);
+        
         Player player = null;
         String player_uuid = null;
         if(sender instanceof Player)

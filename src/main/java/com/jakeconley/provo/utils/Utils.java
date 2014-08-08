@@ -7,6 +7,7 @@ import static com.jakeconley.provo.notifications.Notification.TIMESTAMP_DEFAULT;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -151,5 +152,65 @@ public class Utils
             e.printStackTrace();
             return new HashMap<>();
         }
+    }
+    
+    public static String[] GroupStringArgQuotes(String[] args)
+    {
+        List<String> ret = new LinkedList<>();
+        
+        boolean quoting = false;
+        StringBuilder quoted = null;
+        for(String s : args)
+        {
+            if(!s.contains("\""))
+            {
+                if(quoting) quoted.append(' ').append(s);
+                else ret.add(s);
+            }
+            else
+            {
+                if(quoted != null) quoted.append(" ");
+                else quoted = new StringBuilder();
+                StringBuilder unquoted = new StringBuilder();
+                
+                for(char c : s.toCharArray())
+                {
+                    if(c == '"')
+                    {
+                        if(quoting)
+                        {
+                            if(quoted.length() != 0) ret.add(quoted.toString());
+                            
+                            quoted = null;
+                            quoting = false;
+                        }
+                        else
+                        {
+                            if(unquoted.length() != 0) ret.add(unquoted.toString());
+                            
+                            unquoted = new StringBuilder();
+                            quoting = true;
+                        }
+                        
+                        continue;
+                    }
+                    
+                    if(quoting) quoted.append(c);
+                    else unquoted.append(c);
+                }
+                
+                if(!quoting && quoted != null && quoted.length() != 0) ret.add(quoted.toString());
+                else if(unquoted.length() != 0) ret.add(unquoted.toString());
+            }
+        }
+        if(quoted != null && quoted.length() != 0) ret.add(quoted.toString());//take care of dangling quotes
+        
+        if(Provo.Debug)
+        {
+            StringBuilder debug = new StringBuilder();
+            for(String s : ret) debug.append('"').append(s).append("\" ");
+            Utils.PrlnDebug(debug.toString());
+        }
+        return (String[]) ret.toArray(new String[ret.size()]);
     }
 }

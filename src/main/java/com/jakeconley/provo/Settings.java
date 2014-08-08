@@ -14,6 +14,8 @@ public class Settings
     
     public void AnalyzeConfig()
     {
+        Provo.Debug                 = Settings.get().getBoolean("debug");
+        
         Sorting_MaxClasses          = Settings.get().getInt("sorting.max-classes", -1);
         Sorting_MaxRulesPerClass    = Settings.get().getInt("sorting.max-rules-per-class", -1);
         Sorting_MRPC_IncludeHotbar  = Settings.get().getBoolean("sorting.max-rules-per-class_include-hotbar", false);
@@ -45,6 +47,4 @@ public class Settings
             return false;
         }
     }
-    
-    // TODO:  Analyze
 }
