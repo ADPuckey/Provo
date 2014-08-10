@@ -21,7 +21,9 @@ public class Comparators
             if(ret != 0) return ret;
             ret = o1.getDurability() - o2.getDurability();
             if(ret != 0) return ret;
-            ret = o1.hashCode() - o2.hashCode();//kinda hacky, that can be assessed later
+            ret = o1.getItemMeta().hashCode() - o2.getItemMeta().hashCode();//Last resort to differentiate between item meta shit, kinda hacky but it works ok
+            if(ret != 0) return ret;
+            ret = o2.getAmount() - o1.getAmount();//Amount should sthill be descending.
             if(ret != 0) return ret;
             return 0;
         }
