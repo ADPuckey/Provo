@@ -1,4 +1,4 @@
-Provo (1.0!)
+Provo (1.2!)
 =====
 
 Provo is a plugin with a bunch of features for Bukkit I found were missing from other plugins so I compiled them myself.
