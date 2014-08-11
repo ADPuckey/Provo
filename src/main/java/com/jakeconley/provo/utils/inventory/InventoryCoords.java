@@ -33,7 +33,7 @@ public class InventoryCoords
     public int getRowNumber(){ return RowNumber; }
     public int getColumnNumber(){ return ColumnNumber; }
     public int getGameIndex(){ return GameIndex; }
-    public int getActualIndex(){ return ActualIndex; }
+    public int getDisplayIndex(){ return ActualIndex; }
     
     public InventoryCoords(char _RowLetter, int _RowNumber, int _ColumnNumber, int _Index, int _ActualIndex)
     {

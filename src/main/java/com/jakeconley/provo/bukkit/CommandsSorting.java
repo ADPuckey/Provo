@@ -68,7 +68,7 @@ public class CommandsSorting implements CommandExecutor
         {
             for(PreferencesRule rule : pclass.getRules())
             {
-                if(!rule.isInherited() && pclass.getTargetType() == InventoryType.PLAYER && rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR && rule.getTargetArea().getStart().getActualIndex() <= 8){ Utils.Debug(rule.toString() + " is a hotbar rule"); continue; }
+                if(!rule.isInherited() && pclass.getTargetType() == InventoryType.PLAYER && rule.getTargetArea().getType() == InventoryRange.Type.SINGULAR && rule.getTargetArea().getStart().getGameIndex() <= 8){ Utils.Debug(rule.toString() + " is a hotbar rule"); continue; }
                 else count++;
             }
         }
