@@ -1,5 +1,6 @@
 package com.jakeconley.provo.utils.inventory;
 
+import com.jakeconley.provo.utils.RelativeDirection;
 import static com.jakeconley.provo.utils.inventory.InventoryUtils.ROW_LENGTH;
 
 /**
@@ -47,6 +48,45 @@ public class InventoryCoords
     {        
         int base = row_i * ROW_LENGTH;
         return base + col_i - 1;
+    }
+    
+    public InventoryCoords GetRelative(RelativeDirection direction, InventoryType type)
+    {
+        //ugh switch statement scope...
+        char newletter;
+        int newrow;
+        int newcol;
+        switch(direction)
+        {
+            case UP:
+                newrow = RowNumber - 1;
+                if(newrow < 0) return null;// Range checking
+
+                newletter = (char) (RowLetter - 1);// hacky ass char conversion lol efficient tho
+                if(newletter < '\u0041') return null;
+                
+                return FromIntCoords(newletter, newrow, ColumnNumber, type);
+            case DOWN:
+                newrow = RowNumber + 1;
+                if(newrow >= type.getRowCount()) return null;
+                
+                newletter = (char) (RowLetter + 1);
+                if(newletter >= ((char) ('\u0041' + type.getRowCount()))) return null;
+                
+                return FromIntCoords(newletter, newrow, ColumnNumber, type);
+            case LEFT:
+                newcol = ColumnNumber - 1;
+                if(newcol < 1) return null;
+                
+                return FromIntCoords(RowLetter, RowNumber, newcol, type);
+            case RIGHT:
+                newcol = ColumnNumber + 1;
+                if(newcol > ROW_LENGTH) return null;
+                
+                return FromIntCoords(RowLetter, RowNumber, newcol, type);
+                
+            default: return null;
+        }
     }
     
     
@@ -105,50 +145,63 @@ public class InventoryCoords
         int index_actual = CalculateIndex(row_actual, col_i);
         return new InventoryCoords(row, row_actual, col_i, index, index_actual);
     }
+    private static InventoryCoords FromIntCoords(char row_char, int row_actual, int col_i, InventoryType type)
+    {
+        int row_i;
+        
+        // Corrections for PLAYER inventories
+        if(type == InventoryType.PLAYER)
+        {
+            switch(row_actual)
+            {
+                case 0: row_i = 1; break;
+                case 1: row_i = 2; break;
+                case 2: row_i = 3; break;
+                case 3: row_i = 0; break;
+                default: return null;
+            }
+        }        
+        else row_i = row_actual;
+        
+        int index = CalculateIndex(row_i, col_i);
+        int index_actual = CalculateIndex(row_actual, col_i);
+        
+        return new InventoryCoords(row_char, row_actual, col_i, index, index_actual);
+    }
     public static InventoryCoords FromString(String s, InventoryType type)
     {
         if(s.length() != 2) return null;
         char[] split = s.toUpperCase().toCharArray();
         
-        int row_i = 0;//zero-indexed row_i
         int col_i = 0;//non-zero-indexed column to be parsed later
         int row_actual = 0;
         if(split[0] == 'A')
         {
             row_actual = 0;
-            if(type == InventoryType.PLAYER) row_i = 1;// Corrections
-            else row_i = 0;
         }
         else if(split[0] == 'B')
         {
             row_actual = 1;
-            if(type == InventoryType.PLAYER) row_i = 2;
-            else row_i = 1;
         }
         else if(split[0] == 'C')
         {
             row_actual = 2;
-            if(type == InventoryType.PLAYER) row_i = 3;
-            else row_i = 2;
         }
         else if(split[0] == 'D')
         {
             row_actual = 3;
-            if(type == InventoryType.PLAYER) row_i = 0;
-            else if(type == InventoryType.DOUBLECHEST) row_i = 3;
-            else return null;// (Assumed) Single chests only have 3 rows
+            // Below code not needed cause minimum inventory size has 3 rows...
+            if(type.getRowCount() < 4) return null;
         }
         else if(split[0] == 'E')
         {
             row_actual = 4;
-            if(type == InventoryType.DOUBLECHEST) row_i = 4;
-            else return null;// Only DoubleChests have more than 4 rows
+            if(type.getRowCount() < 5) return null;
         }
         else if(split[0] == 'F')
         {
             row_actual = 5;
-            if(type == InventoryType.DOUBLECHEST) row_i = 5;
-            else return null;
+            if(type.getRowCount() < 5) return null;
         }
         else return null;//if not a-f, invalid string
         
@@ -156,10 +209,7 @@ public class InventoryCoords
         catch(NumberFormatException e){ return null;/* second char needs to be an int */ }        
         if(col_i < 1 || col_i > ROW_LENGTH) return null;//Out of range
         
-        int index = CalculateIndex(row_i, col_i);
-        int index_actual = CalculateIndex(row_actual, col_i);
-        
-        return new InventoryCoords(split[0], row_actual, col_i, index, index_actual);
+        return FromIntCoords(split[0], row_actual, col_i, type);
     }
     
     @Override public String toString(){ return RowLetter + Integer.toString(ColumnNumber); }
