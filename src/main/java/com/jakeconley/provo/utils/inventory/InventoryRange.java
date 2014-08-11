@@ -2,7 +2,7 @@ package com.jakeconley.provo.utils.inventory;
 
 public class InventoryRange
 {
-    public static enum Type{ SINGULAR, LINEAR, RECTANGULAR }
+    public static enum Type{ SINGULAR, WRAPAROUND, RECTANGULAR }
     
     private Type Type;
     private InventoryCoords Start = null;
@@ -25,7 +25,7 @@ public class InventoryRange
         switch(type)
         {
             case SINGULAR: return v.equals(Start) || v.equals(End);
-            case LINEAR:
+            case WRAPAROUND:
                 int big;
                 int mid = v.getActualIndex();
                 int lil;
