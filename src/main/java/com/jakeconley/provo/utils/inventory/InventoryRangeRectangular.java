@@ -34,7 +34,7 @@ public class InventoryRangeRectangular extends InventoryRange
         InventoryCoords newcoords;
         
         newcoords = CurrentCoords.GetRelative((StartIsLeft ? RelativeDirection.RIGHT : RelativeDirection.LEFT), 1, InventoryType.MAX);
-        if(ContainsHorizontal(newcoords)) 
+        if(newcoords != null && ContainsHorizontal(newcoords)) 
         {
             CurrentCoords = newcoords;
             return true;
@@ -43,7 +43,7 @@ public class InventoryRangeRectangular extends InventoryRange
         if(StartIsTop) newcoords = Start.GetRelative(RelativeDirection.DOWN, (CurrentCoords.getRowNumber() - Start.getRowNumber() + 1), InventoryType.MAX);
         else newcoords = Start.GetRelative(RelativeDirection.UP, (Start.getRowNumber() - CurrentCoords.getRowNumber() + 1), InventoryType.MAX);
         
-        if(ContainsVertical(newcoords))
+        if(newcoords != null && ContainsVertical(newcoords))
         {
             CurrentCoords = newcoords;
             return true;

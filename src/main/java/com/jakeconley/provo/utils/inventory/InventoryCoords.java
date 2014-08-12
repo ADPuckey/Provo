@@ -62,16 +62,16 @@ public class InventoryCoords
                 newrow = RowNumber - count;
                 if(newrow < 0) return null;// Range checking
 
-                newletter = (char) (RowLetter - 1);// hacky ass char conversion lol efficient tho
+                newletter = (char) (RowLetter - count);// hacky ass char conversion lol efficient tho
                 if(newletter < '\u0041') return null;
                 
                 return FromIntCoords(newletter, newrow, ColumnNumber, type);
             case DOWN:
                 newrow = RowNumber + count;
-                if(newrow >= type.getRowCount()) return null;
+                if(newrow > type.getRowCount()) return null;
                 
-                newletter = (char) (RowLetter + 1);
-                if(newletter >= ((char) ('\u0041' + type.getRowCount()))) return null;
+                newletter = (char) (RowLetter + count);
+                //if(newletter >= ((char) ('\u0041' + type.getRowCount()))) return null;
                 
                 return FromIntCoords(newletter, newrow, ColumnNumber, type);
             case LEFT:
