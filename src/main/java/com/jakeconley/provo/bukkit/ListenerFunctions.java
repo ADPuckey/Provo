@@ -41,7 +41,7 @@ switch(plugin.getPlayerStatus(event.getPlayer()))
 
         Inventory inventory;
 
-        if(event.getClickedBlock().getType() == Material.CHEST){ inventory = ((Chest) event.getClickedBlock().getState()).getInventory(); }
+        if(event.getClickedBlock().getType() == Material.CHEST || event.getClickedBlock().getType() == Material.TRAPPED_CHEST){ inventory = ((Chest) event.getClickedBlock().getState()).getInventory(); }
         else return;
 
         PreferencesClass pclass = plugin.getSortingCommandExecutor().getVerifiedClass(event.getPlayer());
