@@ -145,7 +145,7 @@ public class SortingPreferencesBackend
         try{ rangetype = InventoryRange.Type.valueOf(section.getString("area_type")); }
         catch(Exception e){ throw new ProvoFormatException("Invalid " + section.getCurrentPath() + ".area_type"); }
         
-        InventoryRange range = new InventoryRange(area_ini, area_fin, rangetype);
+        InventoryRange range = InventoryRange.ForType(area_ini, area_fin, rangetype);
         return new PreferencesRule(section.getInt("priority", 1), range, section.getString("type", "any"));
     }
     public Map<String, Object> PreferencesRuleToYaml(PreferencesRule pref)

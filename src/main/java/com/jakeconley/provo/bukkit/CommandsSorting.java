@@ -530,7 +530,7 @@ if(player == null){ Messages.Player(sender); return true; }
                 return true;
             }
             
-            InventoryRange area = new InventoryRange(start, end, rangetype);
+            InventoryRange area = InventoryRange.ForType(start, end, rangetype);
             PreferencesRule rule = new PreferencesRule(priority, area, item);
             backend.WritePreferencesRule(player_uuid, pclass_str, rule);
             sender.sendMessage(ChatColor.GREEN + "Successfully added rule " + ChatColor.AQUA + rule.toString() + ChatColor.GREEN + " to class \"" + pclass_str + "\".");

@@ -8,15 +8,26 @@ public abstract class InventoryRange
     protected final InventoryCoords Start;
     protected final InventoryCoords End;
     
+    public Type getType(){ return this.Type; }
+    public InventoryCoords getStart(){ return this.Start; }
+    public InventoryCoords getEnd(){ return this.End; }
+    
     protected InventoryRange(InventoryCoords start, InventoryCoords end)
     {
         Start = start;
         End = end;
     }
     
-    public Type getType(){ return this.Type; }
-    public InventoryCoords getStart(){ return this.Start; }
-    public InventoryCoords getEnd(){ return this.End; }
+    public static InventoryRange ForType(InventoryCoords start, InventoryCoords end, Type type)
+    {
+        switch(type)
+        {
+            case SINGULAR: return new InventoryRangeSingular(start);
+            case WRAPAROUND: return new InventoryRangeWraparound(start, end);
+            case RECTANGULAR: return new InventoryRangeRectangular(start, end);
+            default: return null;
+        }
+    }
     
     protected int CurrentIndex = -1;
     /**
