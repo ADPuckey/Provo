@@ -50,7 +50,7 @@ public class InventoryCoords
         return base + col_i - 1;
     }
     
-    public InventoryCoords GetRelative(RelativeDirection direction, InventoryType type)
+    public InventoryCoords GetRelative(RelativeDirection direction, int count, InventoryType type)
     {
         //ugh switch statement scope...
         char newletter;
@@ -59,7 +59,7 @@ public class InventoryCoords
         switch(direction)
         {
             case UP:
-                newrow = RowNumber - 1;
+                newrow = RowNumber - count;
                 if(newrow < 0) return null;// Range checking
 
                 newletter = (char) (RowLetter - 1);// hacky ass char conversion lol efficient tho
@@ -67,7 +67,7 @@ public class InventoryCoords
                 
                 return FromIntCoords(newletter, newrow, ColumnNumber, type);
             case DOWN:
-                newrow = RowNumber + 1;
+                newrow = RowNumber + count;
                 if(newrow >= type.getRowCount()) return null;
                 
                 newletter = (char) (RowLetter + 1);
@@ -75,12 +75,12 @@ public class InventoryCoords
                 
                 return FromIntCoords(newletter, newrow, ColumnNumber, type);
             case LEFT:
-                newcol = ColumnNumber - 1;
+                newcol = ColumnNumber - count;
                 if(newcol < 1) return null;
                 
                 return FromIntCoords(RowLetter, RowNumber, newcol, type);
             case RIGHT:
-                newcol = ColumnNumber + 1;
+                newcol = ColumnNumber + count;
                 if(newcol > ROW_LENGTH) return null;
                 
                 return FromIntCoords(RowLetter, RowNumber, newcol, type);
@@ -145,7 +145,7 @@ public class InventoryCoords
         int index_actual = CalculateIndex(row_actual, col_i);
         return new InventoryCoords(row, row_actual, col_i, index, index_actual);
     }
-    private static InventoryCoords FromIntCoords(char row_char, int row_actual, int col_i, InventoryType type)
+    public static InventoryCoords FromIntCoords(char row_char, int row_actual, int col_i, InventoryType type)
     {
         int row_i;
         
