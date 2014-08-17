@@ -3,6 +3,7 @@ package com.jakeconley.provo;
 import com.jakeconley.provo.utils.Utils;
 import com.jakeconley.provo.yaml.YamlFile;
 import java.io.File;
+import org.bukkit.Material;
 
 public class Settings
 {
@@ -12,9 +13,16 @@ public class Settings
     public int Sorting_MaxRulesPerClass = -1;
     public boolean Sorting_MRPC_IncludeHotbar = false;
     
+    public Material GhostBlock_Material = Material.IRON_BLOCK;
+    public int GhostBlock_Timeout = 5;
+    
     public void AnalyzeConfig()
     {
         Provo.Debug                 = Settings.get().getBoolean("debug");
+	
+	Material gbmat		    = Utils.GetMaterial(Settings.get().getString("ghostblocks.material", "iron block"));
+	GhostBlock_Timeout	    = Settings.get().getInt("ghostblocks.timeout");
+	GhostBlock_Material	    = (gbmat != null ? gbmat : Material.IRON_BLOCK);
         
         Sorting_MaxClasses          = Settings.get().getInt("sorting.max-classes", -1);
         Sorting_MaxRulesPerClass    = Settings.get().getInt("sorting.max-rules-per-class", -1);
