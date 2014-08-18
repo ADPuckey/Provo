@@ -6,6 +6,7 @@ import com.jakeconley.provo.bukkit.*;
 import com.jakeconley.provo.notifications.Notification;
 import com.jakeconley.provo.notifications.NotificationsBackend;
 import com.jakeconley.provo.utils.Utils;
+import com.jakeconley.provo.utils.ghostblock.GhostBlockManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,9 +39,21 @@ public class Provo extends JavaPlugin implements Listener
     // Automatically put IDLE on each join
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerLoginEvent event){ PlayerStatuses.put(event.getPlayer(), FunctionStatus.IDLE); }
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerInteract(PlayerInteractEvent event)
+    {
+	if(!event.hasBlock()) return;
+	if(!GBManager.PlayerHasBlocks(event.getPlayer())) return;
+	if(GBManager.GetByPlayerAndBlock(event.getPlayer(), event.getClickedBlock()) == null) return;
+	    
+	GBManager.DisableAllForPlayer(event.getPlayer());
+    }
     
     private Settings Settings;
     public Settings getSettings(){ return Settings; }
+    
+    private final GhostBlockManager GBManager = new GhostBlockManager();
+    public GhostBlockManager getGhostBlockManager(){ return GBManager; }
     
     private final CommandsGeneral GeneralCommands   = new CommandsGeneral(this);
     private final CommandsSorting SortingCommands   = new CommandsSorting(this);
@@ -81,6 +95,8 @@ public class Provo extends JavaPlugin implements Listener
     @Override
     public void onDisable()
     {
+	GBManager.RemoveAll();
+	
         Utils.Info("Plugin disabled.");
     }
     

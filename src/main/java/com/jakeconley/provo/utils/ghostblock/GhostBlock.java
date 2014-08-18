@@ -1,15 +1,15 @@
 package com.jakeconley.provo.utils.ghostblock;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class GhostBlock
 {
-    private final List<Player> Players = new LinkedList<>();
-    public List<Player> getPlayers(){ return Players; }
+    private final Set<Player> Players = new HashSet<>();
+    public Set<Player> getPlayers(){ return Players; }
     
     private final Block BlockInstance;
     public Block getBlock(){ return BlockInstance; }

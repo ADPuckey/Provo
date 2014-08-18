@@ -1,37 +1,57 @@
 package com.jakeconley.provo.utils.ghostblock;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 public class GhostBlockManager
 {
-    private final Map<String, List<GhostBlock>> Collection = new HashMap<>();
+    private final Set<Player> Players = new HashSet<>();
+    final List<GhostBlock> Collection = new LinkedList<>();//package-visible for GhostBlockIterator
     
-    public Map<String, List<GhostBlock>> getCollection(){ return Collection; }
+    public void addGhostBlock(GhostBlock gb){ Collection.add(gb); }
     
-    public List<GhostBlock> getGhostBlocks(String id){ return Collection.get(id); }
-    public List<GhostBlock> addGhostBlocks(String id, List<GhostBlock> existing){ return Collection.put(id, existing); }
-    public List<GhostBlock> addGhostBlocks(String id){ return Collection.put(id, new LinkedList<GhostBlock>()); }
+    public PlayerIterator PlayerIterator(Player p){ return new PlayerIterator(this, p); }
+    
+    public boolean PlayerHasBlocks(Player p)
+    {
+	return Players.contains(p);
+    }
+    public boolean PlayerAccesses(Player p, GhostBlock g)
+    {
+	return g.getPlayers().contains(p);
+    }
+    public Block GetByPlayerAndBlock(Player p, Block b)
+    {
+	for(GhostBlock g : Collection) if(g.getBlock().equals(b)) return b;
+	return null;
+    }
     
     public void RemoveAll()
     {
-	for(Map.Entry<String, List<GhostBlock>> entry : Collection.entrySet())
-	{
-	    for(GhostBlock block : entry.getValue()) block.Disable();
-	}
-	
+	for(GhostBlock block : Collection)block.Disable();	
 	Collection.clear();
     }
     
-    public void DisableAllForId(String id)
+    public void DisableAllForPlayer(Player p)
     {
-	for(GhostBlock block : Collection.get(id)) block.Disable();
+	for(Iterator<GhostBlock> i = this.PlayerIterator(p); i.hasNext();)
+	{
+	    GhostBlock gb = i.next();
+	    gb.Disable();
+	}
     }
-    public void RemoveAllForId(String id)
+    public void RemoveAllForPlayer(Player p)
     {
-	DisableAllForId(id);
-	Collection.remove(id);
+	for(Iterator<GhostBlock> i = this.PlayerIterator(p); i.hasNext();)
+	{
+	    GhostBlock gb = i.next();
+	    gb.Disable();
+	    i.remove();
+	}
     }
 }
