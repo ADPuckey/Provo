@@ -14,5 +14,5 @@ public class MinecraftConstants
      * Maximum altitude of a block after the anvil update (1.2.1)
      */
     public static final int MAX_HEIGHT = 256;
-    public static final short MONSTERSPAWN_MIN_LIGHT = 8;
+    public static final short MONSTERSPAWN_MAX_LIGHT = 8;
 }
